@@ -23,12 +23,16 @@ export default async function handler(request) {
   const state = await loadState();
 
   if (state.current_user) {
-    state.queue.push(buildQueueEntry(name));
+    const entry = buildQueueEntry(name);
+    state.queue.push(entry);
+    await saveState(state);
+    return jsonResponse({ success: true, mode: "queued", person_id: entry.id, cancel_token: entry.cancel_token });
   } else {
     state.current_user = name;
     state.start_time = Date.now() / 1000;
+    state.current_control_token = crypto.randomUUID();
   }
 
   await saveState(state);
-  return jsonResponse({ success: true });
+  return jsonResponse({ success: true, mode: "started", current_control_token: state.current_control_token });
 }

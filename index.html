@@ -194,12 +194,81 @@
       font-size: 0.85rem;
       letter-spacing: 0.05em;
     }
+    .queue-locked-state {
+      display: none;
+      text-align: center;
+      padding: 14px 16px;
+      background: #f7f5f0;
+      border: 1px solid #e8e3db;
+      border-radius: 14px;
+      color: #8a7a60;
+      font-size: 0.84rem;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
     .hint {
       text-align: center;
       font-size: 0.75rem;
       color: #c0b9aa;
       letter-spacing: 0.05em;
       margin-top: 10px;
+    }
+    .action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-emergency {
+      background: transparent;
+      color: #8a7a60;
+      border: 1px solid #e8e3db;
+    }
+    .btn-emergency:hover {
+      background: #ede9e1;
+      color: #3a3530;
+    }
+    .modal-backdrop-custom {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(58, 53, 48, 0.34);
+      backdrop-filter: blur(4px);
+      z-index: 1100;
+      padding: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-card-custom {
+      width: min(460px, 100%);
+      background: #fff;
+      border: 1px solid #e8e3db;
+      border-radius: 18px;
+      box-shadow: 0 20px 48px rgba(58, 53, 48, 0.16);
+      overflow: hidden;
+    }
+    .modal-card-header {
+      padding: 18px 20px 10px;
+    }
+    .modal-card-title {
+      margin: 0;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.2rem;
+      color: #3a3530;
+    }
+    .modal-card-body {
+      padding: 0 20px 20px;
+      color: #6d6558;
+      font-size: 0.92rem;
+      line-height: 1.8;
+    }
+    .modal-card-body strong {
+      color: #3a3530;
+    }
+    .modal-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 20px 20px;
     }
     .install-banner {
       display: none;
@@ -243,6 +312,29 @@
       color: #8f866f;
       font-size: 0.78rem;
       line-height: 1.5;
+      word-break: normal;
+      overflow-wrap: break-word;
+    }
+    .install-inline-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.6rem;
+      padding: 0 0.42rem;
+      margin: 0 0.15rem;
+      border-radius: 999px;
+      background: #f7f5f0;
+      border: 1px solid #e8e3db;
+      color: #6b5c44;
+      font-size: 0.75rem;
+      font-weight: 600;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .install-note {
+      margin-top: 6px;
+      color: #a09880;
+      font-size: 0.72rem;
     }
     .install-banner-actions {
       display: flex;
@@ -355,6 +447,19 @@
       .queue-item .btn {
         align-self: flex-end;
       }
+      .modal-card-header {
+        padding: 16px 16px 10px;
+      }
+      .modal-card-body {
+        padding: 0 16px 16px;
+      }
+      .modal-card-actions {
+        padding: 0 16px 16px;
+        flex-direction: column-reverse;
+      }
+      .modal-card-actions .btn {
+        width: 100%;
+      }
       .install-banner {
         width: calc(100% - 16px);
         padding: 14px;
@@ -435,7 +540,10 @@
           </div>
         </div>
         <div id="activeControls" style="display: none;">
-          <button class="btn btn-danger w-100" onclick="endUsage()">結束使用</button>
+          <div class="action-stack">
+            <button class="btn btn-danger w-100" id="endUsageButton" onclick="endUsage()">結束使用</button>
+            <button class="btn btn-emergency w-100" id="emergencyEndButton" onclick="openEmergencyModal()">緊急結束</button>
+          </div>
         </div>
       </div>
     </div>
@@ -445,10 +553,13 @@
         <h3>預約佇列</h3>
       </div>
       <div class="card-body">
-        <div class="input-group">
-          <input type="text" class="form-control" id="queueNameInput" placeholder="請輸入您的名字或暱稱" autocomplete="off">
+        <div id="queueEntryControls">
+          <div class="input-group">
+            <input type="text" class="form-control" id="queueNameInput" placeholder="請輸入您的名字或暱稱" autocomplete="off">
+          </div>
+          <button class="btn btn-primary w-100 mb-3" id="queueActionButton" onclick="joinQueue()">加入排隊</button>
         </div>
-        <button class="btn btn-primary w-100 mb-3" id="queueActionButton" onclick="joinQueue()">加入排隊</button>
+        <div class="queue-locked-state" id="queueLockedState"></div>
         <div id="queueList">
           <div class="queue-empty">目前沒有人排隊</div>
         </div>
@@ -472,6 +583,23 @@
     <button class="install-reopen" id="installReopenBtn" title="加入主畫面" aria-label="加入主畫面">📲</button>
   </div>
 
+  <div class="modal-backdrop-custom" id="emergencyModal">
+    <div class="modal-card-custom" role="dialog" aria-modal="true" aria-labelledby="emergencyModalTitle">
+      <div class="modal-card-header">
+        <h2 class="modal-card-title" id="emergencyModalTitle">緊急結束使用</h2>
+      </div>
+      <div class="modal-card-body">
+        這會直接結束 <strong id="emergencyTargetName">目前使用者</strong> 的使用狀態，並立即遞補下一位排隊者。
+        <br>
+        請確認現在真的需要人工介入再繼續。
+      </div>
+      <div class="modal-card-actions">
+        <button class="btn btn-danger" type="button" onclick="closeEmergencyModal()">取消</button>
+        <button class="btn btn-primary" type="button" id="confirmEmergencyButton" onclick="confirmEmergencyEnd()">確認緊急結束</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const installBanner = document.getElementById('installBanner');
     const installReopenBtn = document.getElementById('installReopenBtn');
@@ -482,8 +610,15 @@
     const statusIdleText = document.getElementById('statusIdleText');
     const statusActiveText = document.getElementById('statusActiveText');
     const activeControls = document.getElementById('activeControls');
+    const endUsageButton = document.getElementById('endUsageButton');
+    const emergencyEndButton = document.getElementById('emergencyEndButton');
+    const queueEntryControls = document.getElementById('queueEntryControls');
+    const queueLockedState = document.getElementById('queueLockedState');
     const queueActionButton = document.getElementById('queueActionButton');
     const queueNameInput = document.getElementById('queueNameInput');
+    const emergencyModal = document.getElementById('emergencyModal');
+    const emergencyTargetName = document.getElementById('emergencyTargetName');
+    const confirmEmergencyButton = document.getElementById('confirmEmergencyButton');
 
     const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -494,8 +629,6 @@
     let statusPollTimer = null;
     let statusRequestInFlight = false;
     let timerInterval = null;
-    let prevCurrentUser = null;
-    let prevQueueLength = 0;
 
     async function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
@@ -504,6 +637,50 @@
       } catch (error) {
         console.error('無法註冊 service worker:', error);
       }
+    }
+
+    function getStoredQueueIdentity() {
+      return {
+        personId: localStorage.getItem('macqueue_queue_person_id'),
+        cancelToken: localStorage.getItem('macqueue_queue_cancel_token'),
+      };
+    }
+
+    function clearStoredQueueIdentity() {
+      localStorage.removeItem('macqueue_queue_person_id');
+      localStorage.removeItem('macqueue_queue_cancel_token');
+    }
+
+    function getCurrentUsageToken() {
+      return localStorage.getItem('macqueue_current_control_token');
+    }
+
+    function setCurrentUsageToken(token, ownerName) {
+      if (token) {
+        localStorage.setItem('macqueue_current_control_token', token);
+      }
+      if (ownerName) {
+        localStorage.setItem('macqueue_current_owner_name', ownerName);
+      }
+    }
+
+    function clearCurrentUsageToken() {
+      localStorage.removeItem('macqueue_current_control_token');
+      localStorage.removeItem('macqueue_current_owner_name');
+    }
+
+    function openEmergencyModal() {
+      const currentName = document.getElementById('currentUserName').textContent || '目前使用者';
+      emergencyTargetName.textContent = currentName;
+      emergencyModal.style.display = 'flex';
+    }
+
+    function closeEmergencyModal() {
+      emergencyModal.style.display = 'none';
+    }
+
+    function getIosInstallDescription() {
+      return 'iPhone 可先按瀏覽器中的 <span class="install-inline-badge">分享</span>，再選 <span class="install-inline-badge">加入主畫面</span><div class="install-note">加入主畫面後，下次會更方便直接開啟。</div>';
     }
 
     function configureInstallPrompt(options = {}) {
@@ -578,8 +755,8 @@
 
       if (isIos && !isStandalone) {
         configureInstallPrompt({
-          title: '加入主畫面',
-          description: '點擊 Safari 下方的分享按鈕 ⎋，選「加入至主畫面」。',
+          title: 'iPhone 加入主畫面',
+          description: getIosInstallDescription(),
           showButton: false,
         });
 
@@ -605,8 +782,8 @@
         sessionStorage.removeItem('installDismissed');
         if (isIos && !isStandalone) {
           configureInstallPrompt({
-            title: '加入主畫面',
-            description: '點擊 Safari 下方的分享按鈕 ⎋，選「加入至主畫面」。',
+            title: 'iPhone 加入主畫面',
+            description: getIosInstallDescription(),
             showButton: false,
           });
         } else {
@@ -632,22 +809,6 @@
       statusPollTimer = setTimeout(pollStatusLoop, getPollInterval());
     }
 
-    async function requestNotificationPermission() {
-      if (!('Notification' in window)) return;
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
-    }
-
-    function sendNotification(title, body) {
-      if (!('Notification' in window) || Notification.permission !== 'granted') return;
-      const notification = new Notification(title, {
-        body,
-        icon: 'https://cdn-icons-png.flaticon.com/512/179/179331.png',
-      });
-      setTimeout(() => notification.close(), 5000);
-    }
-
     function updateTimer(startTime) {
       clearInterval(timerInterval);
       function updateDisplay() {
@@ -665,6 +826,7 @@
 
     function updateQueue(queue) {
       const queueList = document.getElementById('queueList');
+      const { personId: myQueuePersonId } = getStoredQueueIdentity();
       if (!queue || queue.length === 0) {
         queueList.innerHTML = '<div class="queue-empty">目前沒有人排隊</div>';
         return;
@@ -672,6 +834,7 @@
 
       queueList.innerHTML = queue.map((person, index) => {
         const joinTime = new Date(person.join_time * 1000).toLocaleTimeString('zh-TW');
+        const canCancel = myQueuePersonId && person.id === myQueuePersonId;
         return `
           <div class="queue-item">
             <div class="queue-item-info">
@@ -681,7 +844,7 @@
                 <div class="queue-item-time">加入時間: ${joinTime}</div>
               </div>
             </div>
-            <button class="btn btn-warning btn-sm" onclick="cancelQueue('${person.id}')">取消</button>
+            ${canCancel ? `<button class="btn btn-warning btn-sm" onclick="cancelQueue('${person.id}')">取消</button>` : ''}
           </div>
         `;
       }).join('');
@@ -696,29 +859,28 @@
 
         const data = await response.json();
         const queue = Array.isArray(data.queue) ? data.queue : [];
-        const myName = localStorage.getItem('macqueue_my_name');
+        const { personId: myQueuePersonId, cancelToken: myQueueCancelToken } = getStoredQueueIdentity();
+        const currentUsageToken = getCurrentUsageToken();
+        const currentOwnerName = localStorage.getItem('macqueue_current_owner_name');
+        let canEndUsage = !!(data.current_user && currentUsageToken && currentOwnerName === data.current_user);
+        let isQueuedOnThisDevice = !!(myQueuePersonId && queue.some((person) => person.id === myQueuePersonId));
 
         if (data.current_user) {
           statusIdleText.style.display = 'none';
           statusActiveText.style.display = 'block';
           activeControls.style.display = 'block';
+          endUsageButton.style.display = canEndUsage ? 'block' : 'none';
+          emergencyEndButton.style.display = 'block';
           document.getElementById('currentUserName').textContent = data.current_user;
           queueActionButton.textContent = '加入排隊';
           updateTimer(data.start_time);
 
-          if (myName && data.current_user === myName && prevCurrentUser !== myName) {
-            sendNotification('Mac Studio 輪到你了！', `${myName}，Mac Studio 現在可以使用囉。`);
+          if (!currentUsageToken && myQueueCancelToken && isQueuedOnThisDevice === false && currentOwnerName !== data.current_user) {
+            setCurrentUsageToken(myQueueCancelToken, data.current_user);
+            clearStoredQueueIdentity();
+            canEndUsage = true;
+            isQueuedOnThisDevice = false;
           }
-
-          if (myName && data.current_user === myName && queue.length > prevQueueLength) {
-            const newPerson = queue[queue.length - 1];
-            if (newPerson) {
-              sendNotification('有人加入排隊', `${newPerson.name} 已加入等待隊列`);
-            }
-          }
-
-          prevCurrentUser = data.current_user;
-          prevQueueLength = queue.length;
         } else {
           statusIdleText.style.display = 'block';
           statusActiveText.style.display = 'none';
@@ -726,8 +888,24 @@
           queueActionButton.textContent = '開始使用';
           clearInterval(timerInterval);
           document.getElementById('timerDisplay').textContent = '00:00';
-          prevCurrentUser = null;
-          prevQueueLength = 0;
+          clearCurrentUsageToken();
+        }
+
+        if (myQueuePersonId && !queue.some((person) => person.id === myQueuePersonId)) {
+          clearStoredQueueIdentity();
+        }
+
+        const shouldLockQueueEntry = isQueuedOnThisDevice || canEndUsage;
+        queueEntryControls.style.display = shouldLockQueueEntry ? 'none' : 'block';
+        if (isQueuedOnThisDevice) {
+          queueLockedState.style.display = 'block';
+          queueLockedState.textContent = '你已在排隊中，可在下方清單中取消自己的預約。';
+        } else if (canEndUsage) {
+          queueLockedState.style.display = 'block';
+          queueLockedState.textContent = '你目前正在使用中，結束使用後才能再次加入佇列。';
+        } else {
+          queueLockedState.style.display = 'none';
+          queueLockedState.textContent = '';
         }
 
         updateQueue(queue);
@@ -757,62 +935,122 @@
         return;
       }
 
-      await requestNotificationPermission();
+      const { cancelToken: existingCancelToken } = getStoredQueueIdentity();
       localStorage.setItem('macqueue_my_name', name);
 
       try {
         const response = await fetch('/api/queue/join', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name }),
+          body: JSON.stringify({ name, existing_cancel_token: existingCancelToken }),
         });
 
         if (!response.ok) {
-          throw new Error('join request failed');
+          const errorPayload = await response.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'join request failed');
+        }
+
+        const result = await response.json();
+
+        if (result.mode === 'queued' && result.person_id && result.cancel_token) {
+          localStorage.setItem('macqueue_queue_person_id', result.person_id);
+          localStorage.setItem('macqueue_queue_cancel_token', result.cancel_token);
+          clearCurrentUsageToken();
+        } else if (result.mode === 'started' && result.current_control_token) {
+          clearStoredQueueIdentity();
+          setCurrentUsageToken(result.current_control_token, name);
+        } else {
+          clearStoredQueueIdentity();
+          clearCurrentUsageToken();
         }
 
         queueNameInput.value = '';
         await updateStatus();
       } catch (error) {
         console.error('錯誤:', error);
-        alert('發生錯誤，請稍後再試!');
+        alert(error.message || '發生錯誤，請稍後再試!');
       }
     }
 
     async function endUsage() {
+      const controlToken = getCurrentUsageToken();
+
+      if (!controlToken) {
+        alert('只有目前使用者本人可以結束使用。');
+        return;
+      }
+
       try {
         const response = await fetch('/api/end-usage', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ control_token: controlToken }),
         });
 
         if (!response.ok) {
-          throw new Error('end usage failed');
+          const errorPayload = await response.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'end usage failed');
         }
 
+        clearCurrentUsageToken();
         await updateStatus();
       } catch (error) {
         console.error('錯誤:', error);
-        alert('發生錯誤，請稍後再試!');
+        alert(error.message || '發生錯誤，請稍後再試!');
+      }
+    }
+
+    async function confirmEmergencyEnd() {
+      confirmEmergencyButton.disabled = true;
+
+      try {
+        const response = await fetch('/api/end-usage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emergency: true }),
+        });
+
+        if (!response.ok) {
+          const errorPayload = await response.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'emergency end failed');
+        }
+
+        clearCurrentUsageToken();
+        closeEmergencyModal();
+        await updateStatus();
+      } catch (error) {
+        console.error('錯誤:', error);
+        alert(error.message || '無法執行緊急結束，請稍後再試!');
+      } finally {
+        confirmEmergencyButton.disabled = false;
       }
     }
 
     async function cancelQueue(personId) {
+      const { cancelToken } = getStoredQueueIdentity();
+
+      if (!cancelToken) {
+        alert('這個裝置只能取消自己的預約。');
+        return;
+      }
+
       try {
         const response = await fetch('/api/queue/cancel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ person_id: personId }),
+          body: JSON.stringify({ person_id: personId, cancel_token: cancelToken }),
         });
 
         if (!response.ok) {
-          throw new Error('cancel failed');
+          const errorPayload = await response.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'cancel failed');
         }
 
+        clearStoredQueueIdentity();
         await updateStatus();
       } catch (error) {
         console.error('錯誤:', error);
-        alert('無法取消排隊，請稍後再試!');
+        alert(error.message || '無法取消排隊，請稍後再試!');
       }
     }
 
@@ -842,10 +1080,19 @@
       }
     });
 
+    emergencyModal.addEventListener('click', (event) => {
+      if (event.target === emergencyModal) {
+        closeEmergencyModal();
+      }
+    });
+
     setupInstallPrompt();
     pollStatusLoop();
     window.joinQueue = joinQueue;
     window.endUsage = endUsage;
+    window.openEmergencyModal = openEmergencyModal;
+    window.closeEmergencyModal = closeEmergencyModal;
+    window.confirmEmergencyEnd = confirmEmergencyEnd;
     window.cancelQueue = cancelQueue;
   </script>
 </body>

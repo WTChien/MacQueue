@@ -7,6 +7,7 @@ function createDefaultState() {
   return {
     current_user: null,
     start_time: null,
+    current_control_token: null,
     queue: [],
   };
 }
@@ -22,6 +23,10 @@ function normalizeQueue(queue) {
       id: String(item.id ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`),
       name: String(item.name).trim(),
       join_time: Number(item.join_time ?? Date.now() / 1000),
+      cancel_token:
+        typeof item.cancel_token === "string" && item.cancel_token.trim().length > 0
+          ? item.cancel_token
+          : crypto.randomUUID(),
     }))
     .filter((item) => item.name.length > 0)
     .sort((left, right) => left.join_time - right.join_time);
@@ -42,6 +47,10 @@ function normalizeState(state) {
     start_time:
       Number.isFinite(Number(state.start_time)) && state.current_user
         ? Number(state.start_time)
+        : null,
+    current_control_token:
+      typeof state.current_control_token === "string" && state.current_control_token.trim().length > 0
+        ? state.current_control_token
         : null,
     queue: normalizeQueue(state.queue),
   };
@@ -66,11 +75,24 @@ export async function saveState(state) {
   return nextState;
 }
 
+export function sanitizeStateForClient(state) {
+  return {
+    current_user: state.current_user,
+    start_time: state.start_time,
+    queue: state.queue.map((person) => ({
+      id: person.id,
+      name: person.name,
+      join_time: person.join_time,
+    })),
+  };
+}
+
 export function buildQueueEntry(name) {
   return {
     id: `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`,
     name,
     join_time: Date.now() / 1000,
+    cancel_token: crypto.randomUUID(),
   };
 }
 
