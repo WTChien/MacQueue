@@ -1,0 +1,16 @@
+{
+  "name": "Mac Studio 使用追蹤",
+  "short_name": "MacQueue",
+  "description": "辦公室 Mac Studio 使用狀態與排隊系統",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5f0",
+  "theme_color": "#f7f5f0",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/179/179331.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

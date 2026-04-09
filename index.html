@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Mac Studio 使用追蹤 - MacQueue</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#f7f5f0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MacQueue">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #f7f5f0;
+      min-height: 100vh;
+      padding: 40px 20px;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #3a3530;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .site-title {
+      text-align: center;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #3a3530;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .site-subtitle {
+      text-align: center;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      color: #a09880;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e8e3db;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .card-header {
+      background: #f7f5f0;
+      border-bottom: 1px solid #e8e3db;
+      padding: 16px 24px;
+    }
+    .card-header h3 {
+      margin: 0;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #a09880;
+    }
+    .card-body {
+      padding: 28px 24px;
+    }
+    .status-display {
+      text-align: center;
+      padding: 28px 16px;
+      background: #f7f5f0;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .status-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #a09880;
+      margin-bottom: 12px;
+    }
+    .status-user {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #3a3530;
+      margin: 0 0 12px;
+    }
+    .status-idle {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #a09880;
+      letter-spacing: 0.05em;
+    }
+    .status-time {
+      font-size: 2.6rem;
+      font-weight: 300;
+      color: #3a3530;
+      letter-spacing: 4px;
+      margin: 0;
+    }
+    .form-control {
+      background: #f7f5f0;
+      border: 1px solid #e8e3db;
+      border-radius: 50px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      color: #3a3530;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      background: #fff;
+      border-color: #8a7a60;
+      box-shadow: none;
+    }
+    .form-control::placeholder {
+      color: #c0b9aa;
+    }
+    .input-group {
+      margin-bottom: 12px;
+    }
+    .btn {
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 10px 24px;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    .btn-primary {
+      background: #6b5c44;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #4e4333;
+      color: #fff;
+    }
+    .btn-danger,
+    .btn-warning {
+      background: #f7f5f0;
+      color: #8a7a60;
+      border: 1px solid #e8e3db;
+    }
+    .btn-danger:hover,
+    .btn-warning:hover {
+      background: #ede9e1;
+      color: #3a3530;
+    }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #f0ece4;
+      gap: 12px;
+    }
+    .queue-item:last-child { border-bottom: none; }
+    .queue-item-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .queue-item-rank {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ede9e1;
+      color: #8a7a60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .queue-item-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #3a3530;
+      word-break: break-word;
+    }
+    .queue-item-time {
+      font-size: 0.78rem;
+      color: #c0b9aa;
+      margin-top: 2px;
+    }
+    .queue-empty {
+      text-align: center;
+      padding: 24px;
+      color: #c0b9aa;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+    .hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #c0b9aa;
+      letter-spacing: 0.05em;
+      margin-top: 10px;
+    }
+    .install-banner {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      width: min(560px, calc(100% - 32px));
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #e8e3db;
+      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(84, 72, 56, 0.12);
+      backdrop-filter: blur(10px);
+      padding: 16px 18px;
+      z-index: 1000;
+      align-items: center;
+      gap: 14px;
+    }
+    .install-banner-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #f7f5f0;
+      border: 1px solid #ece6dc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+    .install-banner-text { flex: 1; min-width: 0; }
+    .install-banner-text strong {
+      display: block;
+      margin-bottom: 3px;
+      color: #3a3530;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+    .install-banner-text span {
+      display: block;
+      color: #8f866f;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    .install-banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn-install,
+    .btn-dismiss {
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-install {
+      background: #6b5c44;
+      color: #fff;
+      border: 1px solid #6b5c44;
+    }
+    .btn-install:hover {
+      background: #4e4333;
+      border-color: #4e4333;
+    }
+    .btn-dismiss {
+      background: #f7f5f0;
+      color: #8a7a60;
+      border: 1px solid #e8e3db;
+    }
+    .btn-dismiss:hover {
+      background: #ede9e1;
+      color: #3a3530;
+    }
+    .install-reopen {
+      display: none;
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 999;
+      border: 1px solid #e8e3db;
+      background: rgba(255, 255, 255, 0.94);
+      color: #8a7a60;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      box-shadow: 0 8px 20px rgba(84, 72, 56, 0.08);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      align-items: center;
+      justify-content: center;
+    }
+    .install-reopen:hover {
+      background: #f7f5f0;
+      color: #3a3530;
+      border-color: #d9d2c6;
+    }
+    @media (max-width: 600px) {
+      .site-title { font-size: 1.5rem; }
+      .status-time { font-size: 2rem; }
+      .card-body { padding: 20px 16px; }
+      .install-banner {
+        width: calc(100% - 24px);
+        padding: 14px;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .install-banner-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .install-reopen {
+        right: 12px;
+        bottom: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+      }
+      .queue-item {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="site-title">Mac Studio 使用追蹤</h1>
+    <p class="site-subtitle">MacQueue</p>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>目前使用狀態</h3>
+      </div>
+      <div class="card-body">
+        <div class="status-display">
+          <div class="status-label">CURRENT USER</div>
+          <div id="statusIdleText" style="display: none;">
+            <div class="status-idle">— 空閒中 —</div>
+          </div>
+          <div id="statusActiveText" style="display: none;">
+            <div class="status-user" id="currentUserName"></div>
+            <div class="status-time"><span id="timerDisplay">00:00</span></div>
+          </div>
+        </div>
+        <div id="activeControls" style="display: none;">
+          <button class="btn btn-danger w-100" onclick="endUsage()">結束使用</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>預約佇列</h3>
+      </div>
+      <div class="card-body">
+        <div class="input-group">
+          <input type="text" class="form-control" id="queueNameInput" placeholder="請輸入您的名字或暱稱" autocomplete="off">
+        </div>
+        <button class="btn btn-primary w-100 mb-3" id="queueActionButton" onclick="joinQueue()">加入排隊</button>
+        <div id="queueList">
+          <div class="queue-empty">目前沒有人排隊</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">頁面在前景時每 3 秒自動更新，背景時降頻到 15 秒。</p>
+
+    <div class="install-banner" id="installBanner">
+      <div class="install-banner-icon">📲</div>
+      <div class="install-banner-text">
+        <strong id="installBannerTitle">加入主畫面</strong>
+        <span id="installBannerDesc">方便下次直接開啟，隨時查看使用狀態</span>
+      </div>
+      <div class="install-banner-actions">
+        <button class="btn-install" id="installBtn">加入</button>
+        <button class="btn-dismiss" id="dismissInstallBtn">不用了</button>
+      </div>
+    </div>
+
+    <button class="install-reopen" id="installReopenBtn" title="加入主畫面" aria-label="加入主畫面">📲</button>
+  </div>
+
+  <script>
+    const installBanner = document.getElementById('installBanner');
+    const installReopenBtn = document.getElementById('installReopenBtn');
+    const installBtn = document.getElementById('installBtn');
+    const dismissInstallBtn = document.getElementById('dismissInstallBtn');
+    const installBannerTitle = document.getElementById('installBannerTitle');
+    const installBannerDesc = document.getElementById('installBannerDesc');
+    const statusIdleText = document.getElementById('statusIdleText');
+    const statusActiveText = document.getElementById('statusActiveText');
+    const activeControls = document.getElementById('activeControls');
+    const queueActionButton = document.getElementById('queueActionButton');
+    const queueNameInput = document.getElementById('queueNameInput');
+
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const VISIBLE_POLL_MS = 3000;
+    const HIDDEN_POLL_MS = 15000;
+
+    let deferredPrompt = null;
+    let statusPollTimer = null;
+    let statusRequestInFlight = false;
+    let timerInterval = null;
+    let prevCurrentUser = null;
+    let prevQueueLength = 0;
+
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        await navigator.serviceWorker.register('/sw.js');
+      } catch (error) {
+        console.error('無法註冊 service worker:', error);
+      }
+    }
+
+    function configureInstallPrompt(options = {}) {
+      installBannerTitle.textContent = options.title || '加入主畫面';
+      installBannerDesc.innerHTML = options.description || '方便下次直接開啟，隨時查看使用狀態';
+      installBtn.style.display = options.showButton === false ? 'none' : '';
+      installBtn.onclick = options.onClick || null;
+    }
+
+    function showInstallBanner() {
+      if (isStandalone) return;
+      installBanner.style.display = 'flex';
+      installReopenBtn.style.display = 'none';
+    }
+
+    function showInstallReopen() {
+      if (isStandalone) {
+        installReopenBtn.style.display = 'none';
+        return;
+      }
+      installReopenBtn.style.display = 'inline-flex';
+    }
+
+    function hideInstallBanner() {
+      installBanner.style.display = 'none';
+      showInstallReopen();
+    }
+
+    function dismissBanner() {
+      sessionStorage.setItem('installDismissed', '1');
+      hideInstallBanner();
+    }
+
+    async function triggerInstallPrompt() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBanner.style.display = 'none';
+        installReopenBtn.style.display = 'none';
+        sessionStorage.removeItem('installDismissed');
+        return;
+      }
+
+      configureInstallPrompt({
+        title: '手動加入主畫面',
+        description: '在 Chrome 右上角開啟選單，選擇「安裝 MacQueue」或「加入主畫面」。',
+        showButton: false,
+      });
+      showInstallBanner();
+    }
+
+    function setupInstallPrompt() {
+      registerServiceWorker();
+
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        configureInstallPrompt({
+          title: '加入主畫面',
+          description: '方便下次直接開啟，隨時查看使用狀態',
+          showButton: true,
+          onClick: triggerInstallPrompt,
+        });
+
+        if (sessionStorage.getItem('installDismissed')) {
+          showInstallReopen();
+        } else {
+          showInstallBanner();
+        }
+      });
+
+      if (isIos && !isStandalone) {
+        configureInstallPrompt({
+          title: '加入主畫面',
+          description: '點擊 Safari 下方的分享按鈕 ⎋，選「加入至主畫面」。',
+          showButton: false,
+        });
+
+        if (sessionStorage.getItem('installDismissed')) {
+          showInstallReopen();
+        } else {
+          showInstallBanner();
+        }
+      }
+
+      if (!isIos && !isStandalone && sessionStorage.getItem('installDismissed')) {
+        configureInstallPrompt({
+          title: '加入主畫面',
+          description: '方便下次直接開啟，隨時查看使用狀態',
+          showButton: true,
+          onClick: triggerInstallPrompt,
+        });
+        showInstallReopen();
+      }
+
+      dismissInstallBtn.addEventListener('click', dismissBanner);
+      installReopenBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('installDismissed');
+        if (isIos && !isStandalone) {
+          configureInstallPrompt({
+            title: '加入主畫面',
+            description: '點擊 Safari 下方的分享按鈕 ⎋，選「加入至主畫面」。',
+            showButton: false,
+          });
+        } else {
+          configureInstallPrompt({
+            title: '加入主畫面',
+            description: deferredPrompt
+              ? '方便下次直接開啟，隨時查看使用狀態'
+              : '在 Chrome 右上角開啟選單，選擇「安裝 MacQueue」或「加入主畫面」。',
+            showButton: true,
+            onClick: triggerInstallPrompt,
+          });
+        }
+        showInstallBanner();
+      });
+    }
+
+    function getPollInterval() {
+      return document.visibilityState === 'visible' ? VISIBLE_POLL_MS : HIDDEN_POLL_MS;
+    }
+
+    function scheduleNextPoll() {
+      clearTimeout(statusPollTimer);
+      statusPollTimer = setTimeout(pollStatusLoop, getPollInterval());
+    }
+
+    async function requestNotificationPermission() {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+    }
+
+    function sendNotification(title, body) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const notification = new Notification(title, {
+        body,
+        icon: 'https://cdn-icons-png.flaticon.com/512/179/179331.png',
+      });
+      setTimeout(() => notification.close(), 5000);
+    }
+
+    function updateTimer(startTime) {
+      clearInterval(timerInterval);
+      function updateDisplay() {
+        const now = Math.floor(Date.now() / 1000);
+        const elapsed = Math.floor(now - startTime);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('timerDisplay').textContent = [minutes, seconds]
+          .map((value) => String(value).padStart(2, '0'))
+          .join(':');
+      }
+      updateDisplay();
+      timerInterval = setInterval(updateDisplay, 1000);
+    }
+
+    function updateQueue(queue) {
+      const queueList = document.getElementById('queueList');
+      if (!queue || queue.length === 0) {
+        queueList.innerHTML = '<div class="queue-empty">目前沒有人排隊</div>';
+        return;
+      }
+
+      queueList.innerHTML = queue.map((person, index) => {
+        const joinTime = new Date(person.join_time * 1000).toLocaleTimeString('zh-TW');
+        return `
+          <div class="queue-item">
+            <div class="queue-item-info">
+              <div class="queue-item-rank">${index + 1}</div>
+              <div>
+                <div class="queue-item-name">${escapeHtml(person.name)}</div>
+                <div class="queue-item-time">加入時間: ${joinTime}</div>
+              </div>
+            </div>
+            <button class="btn btn-warning btn-sm" onclick="cancelQueue('${person.id}')">取消</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateStatus() {
+      try {
+        const response = await fetch('/api/status', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('status request failed');
+        }
+
+        const data = await response.json();
+        const queue = Array.isArray(data.queue) ? data.queue : [];
+        const myName = localStorage.getItem('macqueue_my_name');
+
+        if (data.current_user) {
+          statusIdleText.style.display = 'none';
+          statusActiveText.style.display = 'block';
+          activeControls.style.display = 'block';
+          document.getElementById('currentUserName').textContent = data.current_user;
+          queueActionButton.textContent = '加入排隊';
+          updateTimer(data.start_time);
+
+          if (myName && data.current_user === myName && prevCurrentUser !== myName) {
+            sendNotification('Mac Studio 輪到你了！', `${myName}，Mac Studio 現在可以使用囉。`);
+          }
+
+          if (myName && data.current_user === myName && queue.length > prevQueueLength) {
+            const newPerson = queue[queue.length - 1];
+            if (newPerson) {
+              sendNotification('有人加入排隊', `${newPerson.name} 已加入等待隊列`);
+            }
+          }
+
+          prevCurrentUser = data.current_user;
+          prevQueueLength = queue.length;
+        } else {
+          statusIdleText.style.display = 'block';
+          statusActiveText.style.display = 'none';
+          activeControls.style.display = 'none';
+          queueActionButton.textContent = '開始使用';
+          clearInterval(timerInterval);
+          document.getElementById('timerDisplay').textContent = '00:00';
+          prevCurrentUser = null;
+          prevQueueLength = 0;
+        }
+
+        updateQueue(queue);
+      } catch (error) {
+        console.error('無法更新狀態:', error);
+      }
+    }
+
+    async function pollStatusLoop() {
+      if (statusRequestInFlight) {
+        scheduleNextPoll();
+        return;
+      }
+      statusRequestInFlight = true;
+      try {
+        await updateStatus();
+      } finally {
+        statusRequestInFlight = false;
+        scheduleNextPoll();
+      }
+    }
+
+    async function joinQueue() {
+      const name = queueNameInput.value.trim();
+      if (!name) {
+        alert('請輸入您的名字!');
+        return;
+      }
+
+      await requestNotificationPermission();
+      localStorage.setItem('macqueue_my_name', name);
+
+      try {
+        const response = await fetch('/api/queue/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        });
+
+        if (!response.ok) {
+          throw new Error('join request failed');
+        }
+
+        queueNameInput.value = '';
+        await updateStatus();
+      } catch (error) {
+        console.error('錯誤:', error);
+        alert('發生錯誤，請稍後再試!');
+      }
+    }
+
+    async function endUsage() {
+      try {
+        const response = await fetch('/api/end-usage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+          throw new Error('end usage failed');
+        }
+
+        await updateStatus();
+      } catch (error) {
+        console.error('錯誤:', error);
+        alert('發生錯誤，請稍後再試!');
+      }
+    }
+
+    async function cancelQueue(personId) {
+      try {
+        const response = await fetch('/api/queue/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ person_id: personId }),
+        });
+
+        if (!response.ok) {
+          throw new Error('cancel failed');
+        }
+
+        await updateStatus();
+      } catch (error) {
+        console.error('錯誤:', error);
+        alert('無法取消排隊，請稍後再試!');
+      }
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return String(text).replace(/[&<>"']/g, (char) => map[char]);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        pollStatusLoop();
+      } else {
+        scheduleNextPoll();
+      }
+    });
+
+    queueNameInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        joinQueue();
+      }
+    });
+
+    setupInstallPrompt();
+    pollStatusLoop();
+    window.joinQueue = joinQueue;
+    window.endUsage = endUsage;
+    window.cancelQueue = cancelQueue;
+  </script>
+</body>
+</html>

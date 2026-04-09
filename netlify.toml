@@ -1,0 +1,28 @@
+[build]
+publish = "."
+functions = "netlify/functions"
+
+[[redirects]]
+from = "/api/status"
+to = "/.netlify/functions/status"
+status = 200
+
+[[redirects]]
+from = "/api/start-usage"
+to = "/.netlify/functions/start-usage"
+status = 200
+
+[[redirects]]
+from = "/api/end-usage"
+to = "/.netlify/functions/end-usage"
+status = 200
+
+[[redirects]]
+from = "/api/queue/join"
+to = "/.netlify/functions/queue-join"
+status = 200
+
+[[redirects]]
+from = "/api/queue/cancel"
+to = "/.netlify/functions/queue-cancel"
+status = 200
