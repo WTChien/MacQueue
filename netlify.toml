@@ -26,3 +26,23 @@ status = 200
 from = "/api/queue/cancel"
 to = "/.netlify/functions/queue-cancel"
 status = 200
+
+[[redirects]]
+from = "/api/confirm-usage"
+to = "/.netlify/functions/confirm-usage"
+status = 200
+
+[[redirects]]
+from = "/api/auth/config"
+to = "/.netlify/functions/auth-config"
+status = 200
+
+[[redirects]]
+from = "/api/auth/google"
+to = "/.netlify/functions/auth-google"
+status = 200
+
+[[redirects]]
+from = "/api/auth/reconcile-current"
+to = "/.netlify/functions/auth-reconcile-current"
+status = 200

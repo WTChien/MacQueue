@@ -13,30 +13,36 @@ export default async function handler(request) {
   }
 
   const body = await parseJson(request);
-  const emergency = body?.emergency === true;
+  const controlToken = typeof body?.control_token === "string" ? body.control_token.trim() : "";
+  const samePerson = body?.same_person === true;
   const googleSub = typeof body?.google_sub === "string" ? body.google_sub.trim() : "";
   const googleEmail = typeof body?.google_email === "string" ? body.google_email.trim().toLowerCase() : "";
+  const googleName = typeof body?.name === "string" ? body.name.trim() : "";
+
+  if (!controlToken) {
+    return badRequest("缺少 control_token");
+  }
 
   const state = await loadState();
 
-  if (!state.current_user) {
-    return jsonResponse({ error: "目前沒有使用者" }, 409);
+  if (!state.current_user || !state.current_control_token) {
+    return jsonResponse({ success: true, mode: "no-active-user" });
   }
 
-  if (!emergency) {
-    const controlToken = body?.control_token;
-    const tokenMatched = !!(state.current_control_token && controlToken && state.current_control_token === controlToken);
-    const googleMatched = !!(
-      (googleSub && state.current_google_sub && googleSub === state.current_google_sub) ||
-      (googleEmail && state.current_google_email && googleEmail === state.current_google_email)
-    );
+  if (state.current_control_token !== controlToken) {
+    return jsonResponse({ error: "目前本機沒有可協調的訪客使用狀態" }, 403);
+  }
 
-    if (!tokenMatched && !googleMatched) {
-      if (!controlToken && !googleSub && !googleEmail) {
-        return badRequest("缺少 control_token 或 Google 身分資訊");
-      }
-      return jsonResponse({ error: "只有目前使用者本人可以結束使用" }, 403);
+  if (samePerson) {
+    if (!googleName) {
+      return badRequest("缺少 Google 名字");
     }
+
+    state.current_user = googleName;
+    state.current_google_sub = googleSub || null;
+    state.current_google_email = googleEmail || null;
+    await saveState(state);
+    return jsonResponse({ success: true, mode: "bound", current_user: state.current_user });
   }
 
   state.current_user = null;
@@ -60,5 +66,5 @@ export default async function handler(request) {
   }
 
   await saveState(state);
-  return jsonResponse({ success: true, emergency });
+  return jsonResponse({ success: true, mode: "removed" });
 }

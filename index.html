@@ -11,12 +11,13 @@
   <meta name="apple-mobile-web-app-title" content="MacQueue">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     * { box-sizing: border-box; }
     body {
       background-color: #f7f5f0;
       min-height: 100vh;
-      padding: 40px 20px;
+      padding: 76px 20px 40px;
       font-family: 'Noto Sans TC', sans-serif;
       color: #3a3530;
     }
@@ -40,6 +41,37 @@
       color: #a09880;
       text-transform: uppercase;
       margin-bottom: 40px;
+    }
+    .top-auth-panel {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 1200;
+      width: fit-content;
+      max-width: calc(100vw - 28px);
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #e8e3db;
+      border-radius: 14px;
+      box-shadow: 0 10px 22px rgba(84, 72, 56, 0.1);
+      padding: 10px 12px;
+      backdrop-filter: blur(8px);
+    }
+    .auth-status {
+      font-size: 0.8rem;
+      color: #6d6558;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+    .auth-hint {
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: #a09880;
+      line-height: 1.5;
+    }
+    .auth-signin-wrap {
+      display: flex;
+      justify-content: flex-start;
+      min-height: 44px;
     }
     .card {
       background: #ffffff;
@@ -98,6 +130,17 @@
       color: #3a3530;
       letter-spacing: 4px;
       margin: 0;
+    }
+    .status-pending-badge {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 0.7rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: #a09880;
+      background: #f0ece4;
+      border-radius: 999px;
+      padding: 4px 14px;
     }
     .form-control {
       background: #f7f5f0;
@@ -175,6 +218,23 @@
       font-size: 0.75rem;
       font-weight: 600;
       flex-shrink: 0;
+    }
+    .queue-item-mine {
+      background: #f0ece0;
+      border-radius: 10px;
+      padding: 4px 10px 4px 4px;
+      margin: -4px -10px -4px -4px;
+    }
+    .queue-item-mine .queue-item-rank {
+      background: #6b5c44;
+      color: #fff;
+    }
+    .queue-item-mine .queue-item-name {
+      color: #3a3530;
+      font-weight: 600;
+    }
+    .queue-item-mine .queue-item-time {
+      color: #8a7a60;
     }
     .queue-item-name {
       font-size: 0.95rem;
@@ -269,6 +329,38 @@
       justify-content: flex-end;
       gap: 10px;
       padding: 0 20px 20px;
+    }
+    .auth-reconcile-modal .modal-card-custom {
+      width: min(420px, calc(100vw - 32px));
+      border-radius: 20px;
+      box-shadow: 0 22px 54px rgba(58, 53, 48, 0.2);
+    }
+    .auth-reconcile-modal .modal-card-header {
+      padding: 22px 24px 8px;
+      text-align: center;
+    }
+    .auth-reconcile-modal .modal-card-title {
+      font-size: 1.08rem;
+      letter-spacing: 0.01em;
+    }
+    .auth-reconcile-modal .modal-card-body {
+      padding: 0 24px 18px;
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.75;
+    }
+    .auth-reconcile-name {
+      display: inline-block;
+      margin-top: 2px;
+      color: #3a3530;
+      font-weight: 600;
+    }
+    .auth-reconcile-modal .modal-card-actions {
+      justify-content: center;
+      padding: 0 24px 24px;
+    }
+    .auth-reconcile-modal .btn {
+      min-width: 120px;
     }
     .install-banner {
       display: none;
@@ -399,7 +491,19 @@
     }
     @media (max-width: 600px) {
       body {
-        padding: 24px 12px 88px;
+        padding: 84px 12px 88px;
+      }
+      .top-auth-panel {
+        top: 10px;
+        right: 10px;
+        width: calc(100vw - 20px);
+        padding: 8px 10px;
+      }
+      .auth-status {
+        font-size: 0.76rem;
+      }
+      .auth-hint {
+        font-size: 0.68rem;
       }
       .site-title {
         font-size: 1.45rem;
@@ -520,6 +624,15 @@
   </style>
 </head>
 <body>
+  <div class="top-auth-panel">
+    <div class="auth-status" id="googleAuthStatus">訪客也可正常使用<br>Google 登入可跨裝置操作</div>
+    <div class="auth-signin-wrap" id="googleSigninWrap">
+      <div id="googleSignInButton"></div>
+    </div>
+    <button class="btn btn-emergency w-100 mt-2" id="googleLogoutBtn" style="display: none;">登出 Google</button>
+    <div class="auth-hint" id="googleAuthHint">不登入也能排隊與操作<br>登入後可跨手機/電腦辨識同一位使用者。</div>
+  </div>
+
   <div class="container">
     <h1 class="site-title">Mac Studio 使用追蹤</h1>
     <p class="site-subtitle">MacQueue</p>
@@ -530,7 +643,7 @@
       </div>
       <div class="card-body">
         <div class="status-display">
-          <div class="status-label">CURRENT USER</div>
+          <div class="status-label" id="statusLabel">CURRENT USER</div>
           <div id="statusIdleText" style="display: none;">
             <div class="status-idle">— 空閒中 —</div>
           </div>
@@ -538,12 +651,19 @@
             <div class="status-user" id="currentUserName"></div>
             <div class="status-time"><span id="timerDisplay">00:00</span></div>
           </div>
+          <div id="statusPendingText" style="display: none;">
+            <div class="status-user" id="pendingUserName"></div>
+            <div class="status-pending-badge">等待確認中</div>
+          </div>
         </div>
         <div id="activeControls" style="display: none;">
           <div class="action-stack">
             <button class="btn btn-danger w-100" id="endUsageButton" onclick="endUsage()">結束使用</button>
             <button class="btn btn-emergency w-100" id="emergencyEndButton" onclick="openEmergencyModal()">緊急結束</button>
           </div>
+        </div>
+        <div id="pendingControls" style="display: none;">
+          <button class="btn btn-primary w-100" onclick="openTurnModal()">確認開始使用</button>
         </div>
       </div>
     </div>
@@ -600,6 +720,39 @@
     </div>
   </div>
 
+  <div class="modal-backdrop-custom" id="turnModal">
+    <div class="modal-card-custom" role="dialog" aria-modal="true" aria-labelledby="turnModalTitle">
+      <div class="modal-card-header">
+        <h2 class="modal-card-title" id="turnModalTitle">輪到你了！</h2>
+      </div>
+      <div class="modal-card-body">
+        Mac Studio 目前空閒，現在輪到 <strong id="turnModalName"></strong> 使用囉。<br>
+        計時將在你確認後開始。
+      </div>
+      <div class="modal-card-actions">
+        <button class="btn btn-emergency" type="button" onclick="closeTurnModal()">稍後確認</button>
+        <button class="btn btn-primary" type="button" id="confirmTurnButton" onclick="confirmStartUsage()">開始使用</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop-custom auth-reconcile-modal" id="authReconcileModal">
+    <div class="modal-card-custom" role="dialog" aria-modal="true" aria-labelledby="authReconcileModalTitle">
+      <div class="modal-card-header">
+        <h2 class="modal-card-title" id="authReconcileModalTitle">確認登入身分</h2>
+      </div>
+      <div class="modal-card-body">
+        目前這台裝置正以訪客身分使用中。<br>
+        <span class="auth-reconcile-name" id="authReconcileGuestName"></span><br>
+        這次登入的 Google 帳號是否為同一人？
+      </div>
+      <div class="modal-card-actions">
+        <button class="btn btn-emergency" type="button" id="authReconcileDifferentButton">不是同一人</button>
+        <button class="btn btn-primary" type="button" id="authReconcileSameButton">是，同一人</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const installBanner = document.getElementById('installBanner');
     const installReopenBtn = document.getElementById('installReopenBtn');
@@ -619,6 +772,20 @@
     const emergencyModal = document.getElementById('emergencyModal');
     const emergencyTargetName = document.getElementById('emergencyTargetName');
     const confirmEmergencyButton = document.getElementById('confirmEmergencyButton');
+    const statusPendingText = document.getElementById('statusPendingText');
+    const pendingControls = document.getElementById('pendingControls');
+    const turnModal = document.getElementById('turnModal');
+    const turnModalName = document.getElementById('turnModalName');
+    const confirmTurnButton = document.getElementById('confirmTurnButton');
+    const authReconcileModal = document.getElementById('authReconcileModal');
+    const authReconcileGuestName = document.getElementById('authReconcileGuestName');
+    const authReconcileSameButton = document.getElementById('authReconcileSameButton');
+    const authReconcileDifferentButton = document.getElementById('authReconcileDifferentButton');
+    const googleAuthStatus = document.getElementById('googleAuthStatus');
+    const googleAuthHint = document.getElementById('googleAuthHint');
+    const googleSigninWrap = document.getElementById('googleSigninWrap');
+    const googleSignInButton = document.getElementById('googleSignInButton');
+    const googleLogoutBtn = document.getElementById('googleLogoutBtn');
 
     const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -629,6 +796,140 @@
     let statusPollTimer = null;
     let statusRequestInFlight = false;
     let timerInterval = null;
+    let resolveAuthReconcileChoice = null;
+
+    function getGoogleProfile() {
+      const raw = localStorage.getItem('macqueue_google_profile');
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed.name !== 'string') return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function getGoogleAuthPayload() {
+      const profile = getGoogleProfile();
+      if (!profile) {
+        return { google_sub: null, google_email: null };
+      }
+
+      return {
+        google_sub: typeof profile.sub === 'string' && profile.sub.trim() ? profile.sub.trim() : null,
+        google_email: typeof profile.email === 'string' && profile.email.trim() ? profile.email.trim().toLowerCase() : null,
+      };
+    }
+
+    function renderGoogleAuthState() {
+      const profile = getGoogleProfile();
+      const guestStatusHtml = '訪客也可正常使用<br>Google 登入可跨裝置操作';
+      if (profile) {
+        googleAuthStatus.textContent = '已登入';
+        googleAuthHint.textContent = profile.email ? `Google 帳號：${profile.email}` : '';
+        googleSigninWrap.style.display = 'none';
+        googleLogoutBtn.style.display = 'block';
+        if (!queueNameInput.value.trim()) {
+          queueNameInput.value = profile.name;
+        }
+      } else {
+        googleAuthStatus.innerHTML = guestStatusHtml;
+        googleAuthHint.innerHTML = '不登入也能排隊與操作<br>登入後可跨手機/電腦辨識同一位使用者。';
+        googleSigninWrap.style.display = 'flex';
+        googleLogoutBtn.style.display = 'none';
+      }
+    }
+
+    function clearGoogleProfile() {
+      const profile = getGoogleProfile();
+      localStorage.removeItem('macqueue_google_profile');
+      localStorage.removeItem('macqueue_my_name');
+      if (profile?.name && queueNameInput.value.trim() === profile.name) {
+        queueNameInput.value = '';
+      }
+      renderGoogleAuthState();
+    }
+
+    async function handleGoogleCredentialResponse(response) {
+      const credential = response?.credential;
+      if (!credential) {
+        alert('Google 登入失敗，請重試。');
+        return;
+      }
+
+      try {
+        const verifyResponse = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential }),
+        });
+
+        if (!verifyResponse.ok) {
+          const errorPayload = await verifyResponse.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'Google verification failed');
+        }
+
+        const payload = await verifyResponse.json();
+        const profile = payload?.profile;
+
+        if (!profile?.name) {
+          throw new Error('Google 個人資料不完整');
+        }
+
+        await reconcileCurrentGuestAfterLogin(profile);
+
+        localStorage.setItem('macqueue_google_profile', JSON.stringify(profile));
+        localStorage.setItem('macqueue_my_name', profile.name);
+        queueNameInput.value = profile.name;
+        renderGoogleAuthState();
+      } catch (error) {
+        console.error('Google 登入錯誤:', error);
+        alert(error.message || 'Google 登入失敗，請稍後再試。');
+      }
+    }
+
+    async function setupGoogleAuth() {
+      renderGoogleAuthState();
+      googleLogoutBtn.addEventListener('click', clearGoogleProfile);
+
+      try {
+        const configResponse = await fetch('/api/auth/config', { cache: 'no-store' });
+        if (!configResponse.ok) {
+          throw new Error('auth config failed');
+        }
+
+        const config = await configResponse.json();
+        const clientId = config?.google_client_id;
+
+        if (!clientId) {
+          googleAuthHint.textContent = '管理員尚未設定 Google 登入（缺少 GOOGLE_CLIENT_ID）。';
+          return;
+        }
+
+        if (!window.google?.accounts?.id) {
+          googleAuthHint.textContent = 'Google 登入元件載入失敗，請重新整理頁面。';
+          return;
+        }
+
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCredentialResponse,
+        });
+
+        window.google.accounts.id.renderButton(googleSignInButton, {
+          type: 'standard',
+          size: 'medium',
+          width: 190,
+          text: 'signin_with',
+          shape: 'pill',
+          theme: 'outline',
+        });
+      } catch (error) {
+        console.error('Google 設定錯誤:', error);
+        googleAuthHint.textContent = '目前無法載入 Google 登入，稍後再試。';
+      }
+    }
 
     async function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
@@ -669,6 +970,85 @@
       localStorage.removeItem('macqueue_current_owner_name');
     }
 
+    function closeAuthReconcileModal() {
+      authReconcileModal.style.display = 'none';
+    }
+
+    function chooseAuthReconcile(samePerson) {
+      closeAuthReconcileModal();
+      if (resolveAuthReconcileChoice) {
+        const resolve = resolveAuthReconcileChoice;
+        resolveAuthReconcileChoice = null;
+        resolve(samePerson);
+      }
+    }
+
+    function openAuthReconcileModal(guestName) {
+      authReconcileGuestName.textContent = guestName;
+      authReconcileModal.style.display = 'flex';
+      return new Promise((resolve) => {
+        resolveAuthReconcileChoice = resolve;
+      });
+    }
+
+    async function reconcileCurrentGuestAfterLogin(profile) {
+      const controlToken = getCurrentUsageToken();
+      if (!controlToken) {
+        return;
+      }
+
+      try {
+        const statusResponse = await fetch('/api/status', { cache: 'no-store' });
+        if (!statusResponse.ok) {
+          return;
+        }
+
+        const statusData = await statusResponse.json();
+        const currentOwnerName = localStorage.getItem('macqueue_current_owner_name');
+        const isLocalGuestUsingNow = !!(
+          statusData.current_user &&
+          currentOwnerName &&
+          statusData.current_user === currentOwnerName &&
+          !statusData.current_google_sub
+        );
+
+        if (!isLocalGuestUsingNow) {
+          return;
+        }
+
+        const samePerson = await openAuthReconcileModal(statusData.current_user);
+
+        const reconcileResponse = await fetch('/api/auth/reconcile-current', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            control_token: controlToken,
+            same_person: samePerson,
+            name: profile.name,
+            google_sub: profile.sub || null,
+            google_email: profile.email || null,
+          }),
+        });
+
+        if (!reconcileResponse.ok) {
+          const errorPayload = await reconcileResponse.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'reconcile failed');
+        }
+
+        const reconcileResult = await reconcileResponse.json();
+        if (reconcileResult.mode === 'bound') {
+          setCurrentUsageToken(controlToken, profile.name);
+        }
+        if (reconcileResult.mode === 'removed') {
+          clearCurrentUsageToken();
+        }
+
+        await updateStatus();
+      } catch (error) {
+        console.error('訪客/Google 身分協調失敗:', error);
+      }
+    }
+
     function openEmergencyModal() {
       const currentName = document.getElementById('currentUserName').textContent || '目前使用者';
       emergencyTargetName.textContent = currentName;
@@ -677,6 +1057,56 @@
 
     function closeEmergencyModal() {
       emergencyModal.style.display = 'none';
+    }
+
+    function openTurnModal() {
+      const myName = localStorage.getItem('macqueue_my_name') || '你';
+      turnModalName.textContent = myName;
+      turnModal.style.display = 'flex';
+    }
+
+    function closeTurnModal() {
+      turnModal.style.display = 'none';
+      sessionStorage.setItem('turnModalDismissed', '1');
+    }
+
+    authReconcileSameButton.addEventListener('click', () => chooseAuthReconcile(true));
+    authReconcileDifferentButton.addEventListener('click', () => chooseAuthReconcile(false));
+    authReconcileModal.addEventListener('click', (event) => {
+      if (event.target === authReconcileModal) {
+        chooseAuthReconcile(false);
+      }
+    });
+
+    async function confirmStartUsage() {
+      const { cancelToken: pendingToken } = getStoredQueueIdentity();
+      if (!pendingToken) {
+        alert('無法確認，請重新整理頁面。');
+        return;
+      }
+      confirmTurnButton.disabled = true;
+      try {
+        const response = await fetch('/api/confirm-usage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pending_token: pendingToken }),
+        });
+        if (!response.ok) {
+          const errorPayload = await response.json().catch(() => null);
+          throw new Error(errorPayload?.error || 'confirm failed');
+        }
+        const result = await response.json();
+        clearStoredQueueIdentity();
+        setCurrentUsageToken(result.current_control_token, localStorage.getItem('macqueue_my_name'));
+        turnModal.style.display = 'none';
+        sessionStorage.removeItem('turnModalDismissed');
+        await updateStatus();
+      } catch (error) {
+        console.error('錯誤:', error);
+        alert(error.message || '確認失敗，請稍後再試!');
+      } finally {
+        confirmTurnButton.disabled = false;
+      }
     }
 
     function getIosInstallDescription() {
@@ -827,6 +1257,7 @@
     function updateQueue(queue) {
       const queueList = document.getElementById('queueList');
       const { personId: myQueuePersonId } = getStoredQueueIdentity();
+      const { google_sub: myGoogleSub } = getGoogleAuthPayload();
       if (!queue || queue.length === 0) {
         queueList.innerHTML = '<div class="queue-empty">目前沒有人排隊</div>';
         return;
@@ -834,17 +1265,20 @@
 
       queueList.innerHTML = queue.map((person, index) => {
         const joinTime = new Date(person.join_time * 1000).toLocaleTimeString('zh-TW');
-        const canCancel = myQueuePersonId && person.id === myQueuePersonId;
+        const isMe = !!(
+          (myQueuePersonId && person.id === myQueuePersonId) ||
+          (myGoogleSub && person.google_sub && person.google_sub === myGoogleSub)
+        );
         return `
           <div class="queue-item">
-            <div class="queue-item-info">
+            <div class="queue-item-info ${isMe ? 'queue-item-mine' : ''}">
               <div class="queue-item-rank">${index + 1}</div>
               <div>
                 <div class="queue-item-name">${escapeHtml(person.name)}</div>
                 <div class="queue-item-time">加入時間: ${joinTime}</div>
               </div>
             </div>
-            ${canCancel ? `<button class="btn btn-warning btn-sm" onclick="cancelQueue('${person.id}')">取消</button>` : ''}
+            ${isMe ? `<button class="btn btn-warning btn-sm" onclick="cancelQueue('${person.id}')">取消</button>` : ''}
           </div>
         `;
       }).join('');
@@ -859,45 +1293,75 @@
 
         const data = await response.json();
         const queue = Array.isArray(data.queue) ? data.queue : [];
-        const { personId: myQueuePersonId, cancelToken: myQueueCancelToken } = getStoredQueueIdentity();
+        const { personId: myQueuePersonId } = getStoredQueueIdentity();
         const currentUsageToken = getCurrentUsageToken();
         const currentOwnerName = localStorage.getItem('macqueue_current_owner_name');
-        let canEndUsage = !!(data.current_user && currentUsageToken && currentOwnerName === data.current_user);
-        let isQueuedOnThisDevice = !!(myQueuePersonId && queue.some((person) => person.id === myQueuePersonId));
+        const { google_sub: myGoogleSub } = getGoogleAuthPayload();
+        const canEndUsage = !!(
+          data.current_user && (
+            (currentUsageToken && currentOwnerName === data.current_user) ||
+            (myGoogleSub && data.current_google_sub && myGoogleSub === data.current_google_sub)
+          )
+        );
+        const isQueuedOnThisDevice = !!queue.some((person) =>
+          (myQueuePersonId && person.id === myQueuePersonId) ||
+          (myGoogleSub && person.google_sub && person.google_sub === myGoogleSub),
+        );
+        const isPendingOnThisDevice = !!(
+          (data.pending_person_id && myQueuePersonId && data.pending_person_id === myQueuePersonId) ||
+          (myGoogleSub && data.pending_google_sub && myGoogleSub === data.pending_google_sub)
+        );
 
         if (data.current_user) {
+          document.getElementById('statusLabel').textContent = 'CURRENT USER';
           statusIdleText.style.display = 'none';
           statusActiveText.style.display = 'block';
+          statusPendingText.style.display = 'none';
           activeControls.style.display = 'block';
+          pendingControls.style.display = 'none';
           endUsageButton.style.display = canEndUsage ? 'block' : 'none';
-          emergencyEndButton.style.display = 'block';
+          emergencyEndButton.style.display = canEndUsage ? 'none' : 'block';
           document.getElementById('currentUserName').textContent = data.current_user;
           queueActionButton.textContent = '加入排隊';
           updateTimer(data.start_time);
-
-          if (!currentUsageToken && myQueueCancelToken && isQueuedOnThisDevice === false && currentOwnerName !== data.current_user) {
-            setCurrentUsageToken(myQueueCancelToken, data.current_user);
-            clearStoredQueueIdentity();
-            canEndUsage = true;
-            isQueuedOnThisDevice = false;
+        } else if (data.pending_user) {
+          document.getElementById('statusLabel').textContent = 'NEXT USER';
+          statusIdleText.style.display = 'none';
+          statusActiveText.style.display = 'none';
+          statusPendingText.style.display = 'block';
+          document.getElementById('pendingUserName').textContent = data.pending_user;
+          activeControls.style.display = 'none';
+          pendingControls.style.display = isPendingOnThisDevice ? 'block' : 'none';
+          queueActionButton.textContent = '加入排隊';
+          clearInterval(timerInterval);
+          document.getElementById('timerDisplay').textContent = '00:00';
+          clearCurrentUsageToken();
+          if (isPendingOnThisDevice && !sessionStorage.getItem('turnModalDismissed')) {
+            openTurnModal();
           }
         } else {
+          document.getElementById('statusLabel').textContent = 'CURRENT USER';
           statusIdleText.style.display = 'block';
           statusActiveText.style.display = 'none';
+          statusPendingText.style.display = 'none';
           activeControls.style.display = 'none';
+          pendingControls.style.display = 'none';
           queueActionButton.textContent = '開始使用';
           clearInterval(timerInterval);
           document.getElementById('timerDisplay').textContent = '00:00';
           clearCurrentUsageToken();
         }
 
-        if (myQueuePersonId && !queue.some((person) => person.id === myQueuePersonId)) {
+        if (myQueuePersonId && !queue.some((person) => person.id === myQueuePersonId) && data.pending_person_id !== myQueuePersonId) {
           clearStoredQueueIdentity();
         }
 
-        const shouldLockQueueEntry = isQueuedOnThisDevice || canEndUsage;
+        const shouldLockQueueEntry = isQueuedOnThisDevice || canEndUsage || isPendingOnThisDevice;
         queueEntryControls.style.display = shouldLockQueueEntry ? 'none' : 'block';
-        if (isQueuedOnThisDevice) {
+        if (isPendingOnThisDevice) {
+          queueLockedState.style.display = 'block';
+          queueLockedState.textContent = '輪到你了！請確認是否開始使用。';
+        } else if (isQueuedOnThisDevice) {
           queueLockedState.style.display = 'block';
           queueLockedState.textContent = '你已在排隊中，可在下方清單中取消自己的預約。';
         } else if (canEndUsage) {
@@ -936,13 +1400,19 @@
       }
 
       const { cancelToken: existingCancelToken } = getStoredQueueIdentity();
+      const { google_sub: googleSub, google_email: googleEmail } = getGoogleAuthPayload();
       localStorage.setItem('macqueue_my_name', name);
 
       try {
         const response = await fetch('/api/queue/join', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, existing_cancel_token: existingCancelToken }),
+          body: JSON.stringify({
+            name,
+            existing_cancel_token: existingCancelToken,
+            google_sub: googleSub,
+            google_email: googleEmail,
+          }),
         });
 
         if (!response.ok) {
@@ -974,8 +1444,9 @@
 
     async function endUsage() {
       const controlToken = getCurrentUsageToken();
+      const { google_sub: googleSub, google_email: googleEmail } = getGoogleAuthPayload();
 
-      if (!controlToken) {
+      if (!controlToken && !googleSub && !googleEmail) {
         alert('只有目前使用者本人可以結束使用。');
         return;
       }
@@ -984,7 +1455,11 @@
         const response = await fetch('/api/end-usage', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ control_token: controlToken }),
+          body: JSON.stringify({
+            control_token: controlToken,
+            google_sub: googleSub,
+            google_email: googleEmail,
+          }),
         });
 
         if (!response.ok) {
@@ -1028,8 +1503,9 @@
 
     async function cancelQueue(personId) {
       const { cancelToken } = getStoredQueueIdentity();
+      const { google_sub: googleSub, google_email: googleEmail } = getGoogleAuthPayload();
 
-      if (!cancelToken) {
+      if (!cancelToken && !googleSub && !googleEmail) {
         alert('這個裝置只能取消自己的預約。');
         return;
       }
@@ -1038,7 +1514,12 @@
         const response = await fetch('/api/queue/cancel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ person_id: personId, cancel_token: cancelToken }),
+          body: JSON.stringify({
+            person_id: personId,
+            cancel_token: cancelToken,
+            google_sub: googleSub,
+            google_email: googleEmail,
+          }),
         });
 
         if (!response.ok) {
@@ -1086,6 +1567,13 @@
       }
     });
 
+    turnModal.addEventListener('click', (event) => {
+      if (event.target === turnModal) {
+        closeTurnModal();
+      }
+    });
+
+    setupGoogleAuth();
     setupInstallPrompt();
     pollStatusLoop();
     window.joinQueue = joinQueue;
@@ -1093,6 +1581,9 @@
     window.openEmergencyModal = openEmergencyModal;
     window.closeEmergencyModal = closeEmergencyModal;
     window.confirmEmergencyEnd = confirmEmergencyEnd;
+    window.openTurnModal = openTurnModal;
+    window.closeTurnModal = closeTurnModal;
+    window.confirmStartUsage = confirmStartUsage;
     window.cancelQueue = cancelQueue;
   </script>
 </body>
