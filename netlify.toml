@@ -46,3 +46,8 @@ status = 200
 from = "/api/auth/reconcile-current"
 to = "/.netlify/functions/auth-reconcile-current"
 status = 200
+
+[[redirects]]
+from = "/api/auth/reconcile-queue-entry"
+to = "/.netlify/functions/auth-reconcile-queue-entry"
+status = 200

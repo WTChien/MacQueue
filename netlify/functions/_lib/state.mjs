@@ -133,6 +133,7 @@ export function sanitizeStateForClient(state) {
       name: person.name,
       google_sub: person.google_sub,
       join_time: person.join_time,
+      cancel_token: person.cancel_token,
     })),
   };
 }

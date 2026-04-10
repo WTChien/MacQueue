@@ -17,6 +17,8 @@ MacQueue 是辦公室內部共用 Mac Studio 的排隊與使用狀態系統。
 - 只能取消自己的排隊項目
 - 支援可選 Google 登入（自動帶入名字，且可編輯）
 - 支援訪客直接使用（不登入，每次自行輸入名字）
+- **跨裝置身份辨識**：同一 Google 帳號在不同裝置上操作時，系統認可為同一人
+- **訪客 → Google 綁定**：訪客使用中或排隊中時登入 Google，可選擇綁定為同一人或視為不同人
 - PWA 加入主畫面提示與回呼按鈕
 - 響應式設計（桌機/手機）
 
@@ -34,6 +36,8 @@ MacQueue 是辦公室內部共用 Mac Studio 的排隊與使用狀態系統。
 - [netlify/functions/end-usage.mjs](netlify/functions/end-usage.mjs)：結束使用/緊急結束
 - [netlify/functions/confirm-usage.mjs](netlify/functions/confirm-usage.mjs)：輪到後確認開始
 - [netlify/functions/queue-cancel.mjs](netlify/functions/queue-cancel.mjs)：取消自己的排隊
+- [netlify/functions/auth-reconcile-current.mjs](netlify/functions/auth-reconcile-current.mjs)：協調正在使用中的訪客身份
+- [netlify/functions/auth-reconcile-queue-entry.mjs](netlify/functions/auth-reconcile-queue-entry.mjs)：協調排隊中的訪客身份
 - [netlify/functions/auth-config.mjs](netlify/functions/auth-config.mjs)：回傳登入設定
 - [netlify/functions/auth-google.mjs](netlify/functions/auth-google.mjs)：驗證 Google id token
 
@@ -109,7 +113,29 @@ GOOGLE_CLIENT_ID=你的 Google Web Client ID
 | POST | /api/end-usage | 結束使用（本人 token）或緊急結束 |
 | POST | /api/queue/cancel | 取消自己的排隊（需 cancel token） |
 | GET | /api/auth/config | 回傳 Google 登入 client id |
-| POST | /api/auth/google | 驗證 Google credential 並回傳 profile |
+| P訪客 ↔ Google 身份協調流程
+
+### 場景 1：訪客正在使用，登入 Google
+
+1. 訪客以名字「訪客」進入，系統分配 `control_token` 並開始計時
+2. 訪客登入 Google
+3. 系統偵測本機有亮著的訪客使用，彈出「確認登入身分」modal：
+   - **「是，同一人」**→ 當前使用者名字更新為 Google 名字，綁定 Google 身份。計時繼續。
+   - **「不是同一人」**→ 結束當前訪客使用，狀態清空，佇列下一位被提升為「等待確認」。
+
+### 場景 2：訪客在排隊，登入 Google
+
+1. 訪客以名字「訪客」加入排隊，系統分配 `cancel_token`
+2. 訪客登入 Google
+3. 系統偵測本機有排隊的訪客，彈出「確認登入身分」modal：
+   - **「是，同一人」**→ 排隊列表中該條目名字更新為 Google 名字，綁定 Google 身份。排隊位置不變。
+   - **「不是同一人」**→ 移除該排隊條目。
+
+### 場景 3：跨裝置操作（已登入 Google）
+
+- 同一 Google 帳號在不同裝置上：
+  - 在 A 裝置結束使用 → B 裝置也可直接結束使用（無需 `control_token`，靠 Google 身份驗證）
+  - 在 A 裝置取消排隊 → B 裝置也可直接取消（靠 Google 身份驗證） /api/auth/google | 驗證 Google credential 並回傳 profile |
 
 ## 輪詢與效能
 

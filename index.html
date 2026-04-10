@@ -993,59 +993,107 @@
 
     async function reconcileCurrentGuestAfterLogin(profile) {
       const controlToken = getCurrentUsageToken();
-      if (!controlToken) {
+      const queueIdentity = getStoredQueueIdentity();
+      const cancelToken = queueIdentity.cancelToken;
+
+      // 優先處理使用中的訪客
+      if (controlToken) {
+        try {
+          const statusResponse = await fetch('/api/status', { cache: 'no-store' });
+          if (!statusResponse.ok) {
+            return;
+          }
+
+          const statusData = await statusResponse.json();
+          const currentOwnerName = localStorage.getItem('macqueue_current_owner_name');
+          const isLocalGuestUsingNow = !!(
+            statusData.current_user &&
+            currentOwnerName &&
+            statusData.current_user === currentOwnerName &&
+            !statusData.current_google_sub
+          );
+
+          if (!isLocalGuestUsingNow) {
+            return;
+          }
+
+          const samePerson = await openAuthReconcileModal(statusData.current_user);
+
+          const reconcileResponse = await fetch('/api/auth/reconcile-current', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              control_token: controlToken,
+              same_person: samePerson,
+              name: profile.name,
+              google_sub: profile.sub || null,
+              google_email: profile.email || null,
+            }),
+          });
+
+          if (!reconcileResponse.ok) {
+            const errorPayload = await reconcileResponse.json().catch(() => null);
+            throw new Error(errorPayload?.error || 'reconcile failed');
+          }
+
+          const reconcileResult = await reconcileResponse.json();
+          if (reconcileResult.mode === 'bound') {
+            setCurrentUsageToken(controlToken, profile.name);
+          }
+          if (reconcileResult.mode === 'removed') {
+            clearCurrentUsageToken();
+          }
+
+          await updateStatus();
+        } catch (error) {
+          console.error('訪客/Google 身分協調失敗:', error);
+        }
         return;
       }
 
-      try {
-        const statusResponse = await fetch('/api/status', { cache: 'no-store' });
-        if (!statusResponse.ok) {
-          return;
+      // 如果沒有使用中的訪客，檢查排隊中的訪客
+      if (cancelToken) {
+        try {
+          const statusResponse = await fetch('/api/status', { cache: 'no-store' });
+          if (!statusResponse.ok) {
+            return;
+          }
+
+          const statusData = await statusResponse.json();
+          const queueEntry = statusData.queue.find((item) => item.cancel_token === cancelToken);
+
+          if (!queueEntry) {
+            return;
+          }
+
+          const samePerson = await openAuthReconcileModal(queueEntry.name);
+
+          const reconcileQueueResponse = await fetch('/api/auth/reconcile-queue-entry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cancel_token: cancelToken,
+              same_person: samePerson,
+              name: profile.name,
+              google_sub: profile.sub || null,
+              google_email: profile.email || null,
+            }),
+          });
+
+          if (!reconcileQueueResponse.ok) {
+            const errorPayload = await reconcileQueueResponse.json().catch(() => null);
+            throw new Error(errorPayload?.error || 'reconcile queue entry failed');
+          }
+
+          const reconcileResult = await reconcileQueueResponse.json();
+          if (reconcileResult.mode === 'removed') {
+            clearStoredQueueIdentity();
+          }
+
+          await updateStatus();
+        } catch (error) {
+          console.error('排隊訪客/Google 身分協調失敗:', error);
         }
-
-        const statusData = await statusResponse.json();
-        const currentOwnerName = localStorage.getItem('macqueue_current_owner_name');
-        const isLocalGuestUsingNow = !!(
-          statusData.current_user &&
-          currentOwnerName &&
-          statusData.current_user === currentOwnerName &&
-          !statusData.current_google_sub
-        );
-
-        if (!isLocalGuestUsingNow) {
-          return;
-        }
-
-        const samePerson = await openAuthReconcileModal(statusData.current_user);
-
-        const reconcileResponse = await fetch('/api/auth/reconcile-current', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            control_token: controlToken,
-            same_person: samePerson,
-            name: profile.name,
-            google_sub: profile.sub || null,
-            google_email: profile.email || null,
-          }),
-        });
-
-        if (!reconcileResponse.ok) {
-          const errorPayload = await reconcileResponse.json().catch(() => null);
-          throw new Error(errorPayload?.error || 'reconcile failed');
-        }
-
-        const reconcileResult = await reconcileResponse.json();
-        if (reconcileResult.mode === 'bound') {
-          setCurrentUsageToken(controlToken, profile.name);
-        }
-        if (reconcileResult.mode === 'removed') {
-          clearCurrentUsageToken();
-        }
-
-        await updateStatus();
-      } catch (error) {
-        console.error('訪客/Google 身分協調失敗:', error);
       }
     }
 
