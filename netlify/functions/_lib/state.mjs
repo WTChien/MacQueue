@@ -2,6 +2,7 @@ import { getStore } from "@netlify/blobs";
 
 const STORE_NAME = "macqueue";
 const STATE_KEY = "state";
+export const PENDING_CONFIRM_TIMEOUT_SECONDS = 300;
 
 function createDefaultState() {
   return {
@@ -15,6 +16,7 @@ function createDefaultState() {
     pending_google_email: null,
     pending_person_id: null,
     pending_cancel_token: null,
+    pending_since: null,
     queue: [],
   };
 }
@@ -97,6 +99,12 @@ function normalizeState(state) {
       typeof state.pending_cancel_token === "string" && state.pending_cancel_token.trim().length > 0
         ? state.pending_cancel_token.trim()
         : null,
+    pending_since:
+      Number.isFinite(Number(state.pending_since)) &&
+      typeof state.pending_user === "string" &&
+      state.pending_user.trim().length > 0
+        ? Number(state.pending_since)
+        : null,
     queue: normalizeQueue(state.queue),
   };
 }
@@ -128,6 +136,7 @@ export function sanitizeStateForClient(state) {
     pending_user: state.pending_user,
     pending_google_sub: state.pending_google_sub,
     pending_person_id: state.pending_person_id,
+    pending_since: state.pending_since,
     queue: state.queue.map((person) => ({
       id: person.id,
       name: person.name,
@@ -136,6 +145,69 @@ export function sanitizeStateForClient(state) {
       cancel_token: person.cancel_token,
     })),
   };
+}
+
+export function clearPendingState(state) {
+  state.pending_user = null;
+  state.pending_google_sub = null;
+  state.pending_google_email = null;
+  state.pending_person_id = null;
+  state.pending_cancel_token = null;
+  state.pending_since = null;
+}
+
+export function assignPendingFromEntry(state, entry, nowSeconds = Date.now() / 1000) {
+  if (!entry) {
+    clearPendingState(state);
+    return;
+  }
+
+  state.pending_user = entry.name;
+  state.pending_google_sub = entry.google_sub ?? null;
+  state.pending_google_email = entry.google_email ?? null;
+  state.pending_person_id = entry.id;
+  state.pending_cancel_token = entry.cancel_token;
+  state.pending_since = nowSeconds;
+}
+
+export function promoteNextToPending(state, nowSeconds = Date.now() / 1000) {
+  if (!Array.isArray(state.queue) || state.queue.length === 0) {
+    clearPendingState(state);
+    return false;
+  }
+
+  const nextPerson = state.queue.shift();
+  assignPendingFromEntry(state, nextPerson, nowSeconds);
+  return true;
+}
+
+export function rotateExpiredPending(state, nowSeconds = Date.now() / 1000) {
+  if (!state.pending_user || !state.pending_since) {
+    return false;
+  }
+
+  if (nowSeconds - state.pending_since < PENDING_CONFIRM_TIMEOUT_SECONDS) {
+    return false;
+  }
+
+  const oldPending = {
+    id: state.pending_person_id,
+    name: state.pending_user,
+    google_sub: state.pending_google_sub ?? null,
+    google_email: state.pending_google_email ?? null,
+    join_time: nowSeconds,
+    cancel_token: state.pending_cancel_token,
+  };
+
+  if (!oldPending.id || !oldPending.cancel_token || !Array.isArray(state.queue) || state.queue.length === 0) {
+    state.pending_since = nowSeconds;
+    return false;
+  }
+
+  const nextPerson = state.queue.shift();
+  state.queue.push(oldPending);
+  assignPendingFromEntry(state, nextPerson, nowSeconds);
+  return true;
 }
 
 export function buildQueueEntry(name, googleIdentity = null) {

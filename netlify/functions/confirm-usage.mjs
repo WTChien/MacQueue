@@ -1,4 +1,5 @@
 import {
+  clearPendingState,
   badRequest,
   jsonResponse,
   loadState,
@@ -34,11 +35,7 @@ export default async function handler(request) {
   state.current_google_email = state.pending_google_email ?? null;
   state.start_time = Date.now() / 1000;
   state.current_control_token = crypto.randomUUID();
-  state.pending_user = null;
-  state.pending_google_sub = null;
-  state.pending_google_email = null;
-  state.pending_person_id = null;
-  state.pending_cancel_token = null;
+  clearPendingState(state);
 
   await saveState(state);
   return jsonResponse({ success: true, current_control_token: state.current_control_token });

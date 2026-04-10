@@ -1,9 +1,12 @@
 import {
+  assignPendingFromEntry,
+  clearPendingState,
   badRequest,
   jsonResponse,
   loadState,
   methodNotAllowed,
   parseJson,
+  promoteNextToPending,
   saveState,
 } from "./_lib/state.mjs";
 
@@ -25,39 +28,47 @@ export default async function handler(request) {
 
   const state = await loadState();
 
+  const isSameAsCurrentActive =
+    !!state.current_user &&
+    ((googleSub && state.current_google_sub === googleSub) ||
+      (googleEmail && state.current_google_email === googleEmail));
+
   // 在队列中查找该 cancel_token
   const queueIndex = state.queue.findIndex((item) => item.cancel_token === cancelToken);
 
   if (queueIndex === -1) {
     // 也检查 pending 中是否有这个 cancel_token
     if (state.pending_cancel_token === cancelToken && samePerson) {
+      if (isSameAsCurrentActive) {
+        clearPendingState(state);
+        promoteNextToPending(state);
+
+        await saveState(state);
+        return jsonResponse({ success: true, mode: "removed_already_active" });
+      }
+
       // 绑定 pending 中的条目
       if (!googleName) {
         return badRequest("缺少 Google 名字");
       }
-      state.pending_user = googleName;
-      state.pending_google_sub = googleSub || null;
-      state.pending_google_email = googleEmail || null;
+      assignPendingFromEntry(
+        state,
+        {
+          id: state.pending_person_id,
+          name: googleName,
+          google_sub: googleSub || null,
+          google_email: googleEmail || null,
+          cancel_token: state.pending_cancel_token,
+        },
+        state.pending_since || Date.now() / 1000,
+      );
       await saveState(state);
       return jsonResponse({ success: true, mode: "bound", pending_user: state.pending_user });
     }
 
     if (state.pending_cancel_token === cancelToken && !samePerson) {
-      // 移除 pending 并推进队列
-      state.pending_user = null;
-      state.pending_google_sub = null;
-      state.pending_google_email = null;
-      state.pending_person_id = null;
-      state.pending_cancel_token = null;
-
-      if (state.queue.length > 0) {
-        const nextPerson = state.queue.shift();
-        state.pending_user = nextPerson.name;
-        state.pending_google_sub = nextPerson.google_sub ?? null;
-        state.pending_google_email = nextPerson.google_email ?? null;
-        state.pending_person_id = nextPerson.id;
-        state.pending_cancel_token = nextPerson.cancel_token;
-      }
+      clearPendingState(state);
+      promoteNextToPending(state);
 
       await saveState(state);
       return jsonResponse({ success: true, mode: "removed" });
@@ -68,6 +79,12 @@ export default async function handler(request) {
 
   // 队列中找到了
   if (samePerson) {
+    if (isSameAsCurrentActive) {
+      state.queue.splice(queueIndex, 1);
+      await saveState(state);
+      return jsonResponse({ success: true, mode: "removed_already_active" });
+    }
+
     if (!googleName) {
       return badRequest("缺少 Google 名字");
     }

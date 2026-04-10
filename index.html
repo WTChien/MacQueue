@@ -190,6 +190,13 @@
       background: #ede9e1;
       color: #3a3530;
     }
+    #queueActionButton,
+    #confirmTurnButton,
+    #endUsageButton {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
     .queue-item {
       display: flex;
       align-items: center;
@@ -489,6 +496,203 @@
       color: #3a3530;
       border-color: #d9d2c6;
     }
+    .top-auth-panel-icon {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      display: none;
+    }
+    .top-auth-panel.egg-growing {
+      z-index: 5200;
+      will-change: transform;
+      box-shadow: 0 18px 38px rgba(84, 72, 56, 0.2);
+      transition: none;
+      overflow: visible;
+    }
+    .top-auth-panel.egg-ready {
+      animation: authEggPulse 0.7s ease-in-out 1;
+    }
+    @keyframes authEggPulse {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.14); }
+      100% { transform: scale(1); }
+    }
+    #secretUrlOverlay .modal-card-custom {
+      width: min(560px, calc(100vw - 30px));
+    }
+    .secret-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 20px);
+      z-index: 5300;
+      background: rgba(58, 53, 48, 0.94);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .secret-toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    .easter-basketball-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1400;
+      background: radial-gradient(circle at 50% 8%, #121212 0%, #060606 48%, #000 100%);
+      padding: 12px;
+    }
+    .basketball-head {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      padding: 10px 12px;
+      backdrop-filter: blur(8px);
+    }
+    .basketball-title {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f2f2f2;
+      letter-spacing: 0.03em;
+      flex-shrink: 0;
+    }
+    .basketball-subtitle {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.84);
+      flex: 1;
+    }
+    .pool-english-wrap {
+      min-width: 132px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .pool-english-label {
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      color: rgba(255, 240, 220, 0.78);
+      user-select: none;
+    }
+    .pool-english-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 132px;
+    }
+    .pool-english-row span {
+      font-size: 0.62rem;
+      color: rgba(255, 240, 220, 0.75);
+      user-select: none;
+    }
+    #poolEnglishSlider {
+      flex: 1;
+      accent-color: #9cd4ff;
+      cursor: pointer;
+    }
+    .pool-english-value {
+      font-size: 0.64rem;
+      color: rgba(194, 229, 255, 0.92);
+      min-width: 28px;
+      text-align: right;
+      user-select: none;
+    }
+    .pool-power-wrap {
+      position: absolute;
+      left: 20px;
+      top: 84px;
+      bottom: 22px;
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      pointer-events: auto;
+    }
+    .pool-power-track {
+      position: relative;
+      overflow: hidden;
+      width: 12px;
+      height: min(56vh, 360px);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 160, 70, 0.2) 0%, rgba(255, 215, 160, 0.9) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+    .pool-power-guides {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 8px;
+      bottom: 8px;
+      border-radius: 999px;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 248, 232, 0.2) 0 1px,
+          transparent 1px calc(1%)
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          transparent 19.6%, rgba(255, 248, 232, 0.62) 19.6%, rgba(255, 248, 232, 0.62) 20.4%, transparent 20.4%,
+          transparent 39.6%, rgba(255, 248, 232, 0.62) 39.6%, rgba(255, 248, 232, 0.62) 40.4%, transparent 40.4%,
+          transparent 59.6%, rgba(255, 248, 232, 0.62) 59.6%, rgba(255, 248, 232, 0.62) 60.4%, transparent 60.4%,
+          transparent 79.6%, rgba(255, 248, 232, 0.62) 79.6%, rgba(255, 248, 232, 0.62) 80.4%, transparent 80.4%,
+          transparent 100%
+        );
+    }
+    #poolPowerSlider {
+      writing-mode: bt-lr;
+      appearance: slider-vertical;
+      -webkit-appearance: slider-vertical;
+      position: relative;
+      z-index: 2;
+      width: 12px;
+      height: calc(100% - 12px);
+      margin: 0;
+      accent-color: #f6c57f;
+      background: transparent;
+    }
+    .pool-power-value {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -2px;
+      font-size: 0.7rem;
+      color: rgba(255, 235, 210, 0.9);
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+    #basketballCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, #0f1012 0%, #111317 62%, #0a0b0d 100%);
+      touch-action: none;
+    }
     @media (max-width: 600px) {
       body {
         padding: 84px 12px 88px;
@@ -496,8 +700,71 @@
       .top-auth-panel {
         top: 10px;
         right: 10px;
-        width: calc(100vw - 20px);
-        padding: 8px 10px;
+        width: 48px;
+        max-height: 48px;
+        border-radius: 50%;
+        padding: 0;
+        overflow: hidden;
+        transform-origin: top right;
+        transition: max-height 0.32s ease, width 0.32s ease, border-radius 0.32s ease;
+      }
+      .top-auth-panel.egg-growing {
+        overflow: visible;
+      }
+      .top-auth-panel-icon {
+        display: flex;
+        width: 48px;
+        height: 48px;
+        align-items: center;
+        justify-content: center;
+        color: #6d6558;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .top-auth-panel-icon .icon-person { display: block; }
+      .top-auth-panel-icon .icon-close  { display: none; }
+      .top-auth-panel-content {
+        display: none;
+      }
+      .top-auth-panel.expanded {
+        width: min(272px, calc(100vw - 20px));
+        max-height: 420px;
+        border-radius: 14px;
+      }
+      .top-auth-panel.expanded .top-auth-panel-icon {
+        display: flex;
+        width: 100%;
+        height: 40px;
+        justify-content: flex-end;
+        align-items: center;
+        padding-right: 14px;
+        border-bottom: 1px solid #f0ece4;
+      }
+      .top-auth-panel.expanded .top-auth-panel-icon .icon-person { display: none; }
+      .top-auth-panel.expanded .top-auth-panel-icon .icon-close  { display: block; color: #a09880; }
+      .top-auth-panel.expanded .top-auth-panel-content {
+        display: block;
+        padding: 10px 12px 12px;
+      }
+      .top-auth-panel.egg-growing .top-auth-panel-icon {
+        display: flex;
+        width: 48px;
+        justify-content: center;
+        padding-right: 0;
+        border-bottom: none;
+      }
+      .top-auth-panel.egg-growing .top-auth-panel-icon .icon-person { display: block; }
+      .top-auth-panel.egg-growing .top-auth-panel-icon .icon-close  { display: none; }
+      .top-auth-panel.egg-growing .top-auth-panel-content { display: none; }
+      .install-reopen {
+        right: 12px;
+        bottom: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
       .auth-status {
         font-size: 0.76rem;
@@ -603,6 +870,12 @@
         height: 44px;
         font-size: 1rem;
       }
+      .basketball-head {
+        flex-wrap: wrap;
+      }
+      .basketball-head .btn {
+        width: 100%;
+      }
     }
     @media (max-width: 380px) {
       .site-title {
@@ -624,13 +897,24 @@
   </style>
 </head>
 <body>
-  <div class="top-auth-panel">
-    <div class="auth-status" id="googleAuthStatus">訪客也可正常使用<br>Google 登入可跨裝置操作</div>
-    <div class="auth-signin-wrap" id="googleSigninWrap">
-      <div id="googleSignInButton"></div>
+  <div class="top-auth-panel" id="topAuthPanel">
+    <div class="top-auth-panel-icon" id="topAuthPanelIcon" role="button" tabindex="0" aria-label="展開登入選項">
+      <svg class="icon-person" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <svg class="icon-close" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
     </div>
-    <button class="btn btn-emergency w-100 mt-2" id="googleLogoutBtn" style="display: none;">登出 Google</button>
-    <div class="auth-hint" id="googleAuthHint">不登入也能排隊與操作<br>登入後可跨手機/電腦辨識同一位使用者。</div>
+    <div class="top-auth-panel-content">
+      <div class="auth-status" id="googleAuthStatus">訪客也可正常使用<br>Google 登入可跨裝置操作</div>
+      <div class="auth-signin-wrap" id="googleSigninWrap">
+        <div id="googleSignInButton"></div>
+      </div>
+      <button class="btn btn-emergency w-100 mt-2" id="googleLogoutBtn" style="display: none;">登出 Google</button>
+      <div class="auth-hint" id="googleAuthHint">不登入也能排隊與操作<br>登入後可跨手機/電腦辨識同一位使用者。</div>
+    </div>
   </div>
 
   <div class="container">
@@ -753,6 +1037,51 @@
     </div>
   </div>
 
+  <div class="modal-backdrop-custom" id="secretUrlOverlay">
+    <div class="modal-card-custom" role="dialog" aria-modal="true" aria-labelledby="secretUrlTitle">
+      <div class="modal-card-header">
+        <h2 class="modal-card-title" id="secretUrlTitle">彩蛋網址設定</h2>
+      </div>
+      <div class="modal-card-body">
+        請輸入保齡球全倒後要跳轉的網址（需以 http:// 或 https:// 開頭）。
+        <div class="mt-3">
+          <input type="url" class="form-control" id="secretUrlInput" placeholder="https://example.com">
+        </div>
+      </div>
+      <div class="modal-card-actions">
+        <button class="btn btn-emergency" type="button" id="secretUrlCancelButton">取消</button>
+        <button class="btn btn-primary" type="button" id="secretUrlSaveButton">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="easter-basketball-overlay" id="basketballOverlay">
+    <div class="basketball-head">
+      <div class="basketball-title">Pool Mode</div>
+      <div class="basketball-subtitle" id="basketballSubtitle">美式快布：黑球進袋即勝，白球進袋會回桌中央。</div>
+      <div class="pool-english-wrap">
+        <div class="pool-english-label">左右塞（English）</div>
+        <div class="pool-english-row">
+          <span>左</span>
+          <input type="range" id="poolEnglishSlider" min="-100" max="100" value="0">
+          <span>右</span>
+          <div class="pool-english-value" id="poolEnglishValue">0</div>
+        </div>
+      </div>
+      <button class="btn btn-emergency" type="button" id="basketballCloseButton">關閉</button>
+    </div>
+    <div class="pool-power-wrap">
+      <div class="pool-power-track">
+        <div class="pool-power-guides" aria-hidden="true"></div>
+        <input type="range" id="poolPowerSlider" min="15" max="100" value="56" orient="vertical">
+      </div>
+      <div class="pool-power-value" id="poolPowerValue">56%</div>
+    </div>
+    <canvas id="basketballCanvas"></canvas>
+  </div>
+
+  <div class="secret-toast" id="secretToast">設定成功</div>
+
   <script>
     const installBanner = document.getElementById('installBanner');
     const installReopenBtn = document.getElementById('installReopenBtn');
@@ -786,6 +1115,21 @@
     const googleSigninWrap = document.getElementById('googleSigninWrap');
     const googleSignInButton = document.getElementById('googleSignInButton');
     const googleLogoutBtn = document.getElementById('googleLogoutBtn');
+    const topAuthPanel = document.getElementById('topAuthPanel');
+    const topAuthPanelIcon = document.getElementById('topAuthPanelIcon');
+    const secretUrlOverlay = document.getElementById('secretUrlOverlay');
+    const secretUrlInput = document.getElementById('secretUrlInput');
+    const secretUrlCancelButton = document.getElementById('secretUrlCancelButton');
+    const secretUrlSaveButton = document.getElementById('secretUrlSaveButton');
+    const basketballOverlay = document.getElementById('basketballOverlay');
+    const basketballCanvas = document.getElementById('basketballCanvas');
+    const basketballCloseButton = document.getElementById('basketballCloseButton');
+    const basketballSubtitle = document.getElementById('basketballSubtitle');
+    const poolPowerSlider = document.getElementById('poolPowerSlider');
+    const poolPowerValue = document.getElementById('poolPowerValue');
+    const poolEnglishSlider = document.getElementById('poolEnglishSlider');
+    const poolEnglishValue = document.getElementById('poolEnglishValue');
+    const secretToast = document.getElementById('secretToast');
 
     const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -797,6 +1141,14 @@
     let statusRequestInFlight = false;
     let timerInterval = null;
     let resolveAuthReconcileChoice = null;
+    let suppressInstallReopenClick = false;
+    const EASTER_URL_KEY = 'macqueue_easter_url';
+    let topPanelGrowthRaf = 0;
+    let topPanelGrowthStart = 0;
+    let topPanelGrowthScale = 1;
+    let suppressTopPanelToggle = false;
+    let growDelayTimer = null;
+    let secretToastTimer = null;
 
     function getGoogleProfile() {
       const raw = localStorage.getItem('macqueue_google_profile');
@@ -970,6 +1322,742 @@
       localStorage.removeItem('macqueue_current_owner_name');
     }
 
+    function getEasterUrl() {
+      return localStorage.getItem(EASTER_URL_KEY) || '';
+    }
+
+    function isValidHttpUrl(urlText) {
+      try {
+        const parsed = new URL(urlText);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    }
+
+    function closeSecretUrlOverlay() {
+      secretUrlOverlay.style.display = 'none';
+    }
+
+    function showSecretToast(message) {
+      if (!secretToast) return;
+      secretToast.textContent = message;
+      secretToast.classList.add('show');
+      if (secretToastTimer) {
+        clearTimeout(secretToastTimer);
+      }
+      secretToastTimer = setTimeout(() => {
+        secretToast.classList.remove('show');
+      }, 1600);
+    }
+
+    function openSecretUrlOverlay() {
+      secretUrlInput.value = getEasterUrl();
+      secretUrlOverlay.style.display = 'flex';
+      requestAnimationFrame(() => {
+        secretUrlInput.focus();
+        secretUrlInput.select();
+      });
+    }
+
+    function saveSecretUrl() {
+      const nextUrl = secretUrlInput.value.trim();
+      if (!nextUrl) {
+        localStorage.removeItem(EASTER_URL_KEY);
+        closeSecretUrlOverlay();
+        showSecretToast('已清除彩蛋網址');
+        return;
+      }
+
+      if (!isValidHttpUrl(nextUrl)) {
+        alert('網址格式不正確，請使用 http:// 或 https://');
+        return;
+      }
+
+      localStorage.setItem(EASTER_URL_KEY, nextUrl);
+      closeSecretUrlOverlay();
+      showSecretToast('彩蛋網址設定成功');
+    }
+
+    function setupActionButtonGameTrigger(button) {
+      if (!button) return;
+      let suppressClick = false;
+
+      button.addEventListener('contextmenu', (event) => event.preventDefault());
+
+      setupLongPress(button, {
+        holdMs: 2000,
+        onStart: () => {
+          button.style.filter = 'brightness(1.08)';
+        },
+        onCancel: () => {
+          button.style.filter = '';
+        },
+        onComplete: () => {
+          suppressClick = true;
+          button.style.filter = '';
+          startPoolGame();
+        },
+      });
+
+      button.addEventListener('click', (event) => {
+        if (!suppressClick) return;
+        suppressClick = false;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, true);
+    }
+
+    function toggleTopAuthPanel() {
+      if (suppressTopPanelToggle) {
+        suppressTopPanelToggle = false;
+        return;
+      }
+      topAuthPanel.classList.toggle('expanded');
+    }
+
+    function startTopPanelGrowth() {
+      topPanelGrowthStart = performance.now();
+      topAuthPanel.classList.add('egg-growing');
+      topAuthPanel.style.transformOrigin = 'top right';
+      const maxWindowScale = Math.max(window.innerWidth / 140, window.innerHeight / 90);
+
+      function animate(now) {
+        const elapsed = now - topPanelGrowthStart;
+        const scale = 1 + elapsed / 420;
+        topPanelGrowthScale = Math.min(scale, maxWindowScale + 8);
+        topAuthPanel.style.transform = `scale(${topPanelGrowthScale})`;
+        topPanelGrowthRaf = requestAnimationFrame(animate);
+      }
+
+      topPanelGrowthRaf = requestAnimationFrame(animate);
+    }
+
+    function stopTopPanelGrowth(reset = true) {
+      if (topPanelGrowthRaf) {
+        cancelAnimationFrame(topPanelGrowthRaf);
+        topPanelGrowthRaf = 0;
+      }
+      if (reset) {
+        topAuthPanel.classList.remove('egg-growing');
+        topAuthPanel.style.transform = '';
+      }
+    }
+
+    function setupLongPress(target, options) {
+      if (!target) return;
+
+      const holdMs = options.holdMs || 5000;
+      let timerId = null;
+      let triggered = false;
+
+      function resetState(event) {
+        if (timerId) {
+          clearTimeout(timerId);
+          timerId = null;
+        }
+        if (!triggered && options.onCancel) {
+          options.onCancel(event);
+        }
+      }
+
+      target.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        if (options.shouldIgnore && options.shouldIgnore(event)) {
+          return;
+        }
+
+        triggered = false;
+        if (options.onStart) {
+          options.onStart(event);
+        }
+
+        timerId = setTimeout(() => {
+          triggered = true;
+          if (options.onComplete) {
+            options.onComplete(event);
+          }
+        }, holdMs);
+      });
+
+      target.addEventListener('pointerup', resetState);
+      target.addEventListener('pointercancel', resetState);
+      target.addEventListener('pointerleave', resetState);
+    }
+
+    function startPoolGame() {
+      const redirectUrl = getEasterUrl();
+      if (!redirectUrl) {
+        alert('請先長按右上角登入框 5 秒設定彩蛋網址。');
+        return;
+      }
+
+      basketballOverlay.style.display = 'block';
+      const titleEl = basketballOverlay.querySelector('.basketball-title');
+      if (titleEl) titleEl.textContent = 'Pool Mode';
+      basketballSubtitle.textContent = '美式快布：黑球進袋即勝，白球進袋會回桌中央。';
+
+      const ctx = basketballCanvas.getContext('2d');
+      if (!ctx) {
+        basketballOverlay.style.display = 'none';
+        return;
+      }
+
+      let rafId = 0;
+      let running = true;
+      let isAiming = false;
+      let hasAim = false;
+      let shotQueuedBySlider = false;
+      let sliderPointerActive = false;
+      let lastDragPoint = null;
+      let scored = false;
+      let onPowerInput = null;
+      let onEnglishInput = null;
+      const table = { w: 0, h: 0, x: 0, y: 0, pocketR: 0, rail: 0 };
+      const BALL_R = 11;
+      const PHYSICS = {
+        stopSpeedCue: 0.025,
+        stopSpeedObject: 0.04,
+        rollingFrictionCue: 0.983,
+        rollingFrictionObject: 0.972,
+        slidingDecelCue: 0.10,
+        slidingDecelObject: 0.16,
+        slideFramesAtShot: 30,
+        slideFramesAfterCollision: 8,
+        rollTransitionSpeed: 1.05,
+        spinDecaySliding: 0.962,
+        spinDecayRolling: 0.988,
+        englishCurve: 0.036,
+        cushionRestitution: 0.93,
+        cushionTangentKeep: 0.992,
+        ballRestitution: 0.975,
+        ballBallFriction: 0.06,
+        throwFromEnglish: 0.012,
+      };
+      const balls = [];
+      let cueBall = null;
+      let blackBall = null;
+      const aim = { dx: 1, dy: 0, power: 0.56, english: 0 };
+
+      function makeBall(x, y, color, isCue = false) {
+        return {
+          x,
+          y,
+          vx: 0,
+          vy: 0,
+          r: BALL_R,
+          color,
+          isCue,
+          active: true,
+          phase: 'rolling',
+          slideFrames: 0,
+          spinZ: 0,
+        };
+      }
+
+      function isPortrait() {
+        return basketballCanvas.width < basketballCanvas.height;
+      }
+
+      function layoutBalls() {
+        balls.length = 0;
+        blackBall = null;
+        const portrait = isPortrait();
+        const cueX = table.x + table.w * 0.5;
+        const cueY = portrait
+          ? table.y + table.h * 0.76
+          : table.y + table.h * 0.5;
+        const cueInitX = portrait ? table.x + table.w * 0.5 : table.x + table.w * 0.24;
+        const cueInitY = cueY;
+        cueBall = makeBall(cueInitX, cueInitY, '#f8f8f3', true);
+        balls.push(cueBall);
+        aim.dx = portrait ? 0 : 1;
+        aim.dy = portrait ? -1 : 0;
+        hasAim = false;
+        aim.english = Number(poolEnglishSlider?.value || 0) / 100;
+        const colors = ['#f5d14a', '#2f64ff', '#e23c3c', '#2dac58', '#7826d6'];
+        const rackX = table.x + table.w * 0.5;
+        const gap = BALL_R * 2 + 0.2;
+        const rowAdvance = gap * Math.sqrt(3) * 0.5;
+        // Portrait: inverted triangle — 3-ball row at top, apex at bottom.
+        // rackY is the y of the top (widest) row (row 2).
+        const rackY = portrait
+          ? table.y + table.h * 0.26
+          : table.y + table.h * 0.5;
+        let colorIdx = 0;
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col <= row; col++) {
+            let x, y;
+            if (portrait) {
+              // Inverted triangle: row 2 at top (rackY), row 0 at bottom.
+              x = rackX + (col - row / 2) * gap;
+              y = rackY + (2 - row) * rowAdvance;
+            } else {
+              x = rackX + (row - 1) * rowAdvance;
+              y = rackY + (col - row / 2) * gap;
+            }
+            if (row === 2 && col === 1) {
+              blackBall = makeBall(x, y, '#111111');
+              balls.push(blackBall);
+            } else {
+              balls.push(makeBall(x, y, colors[colorIdx % colors.length]));
+              colorIdx += 1;
+            }
+          }
+        }
+      }
+
+      function allBallsStopped() {
+        return balls.every((b) => {
+          if (!b.active) return true;
+          const stopSpeed = b.isCue ? PHYSICS.stopSpeedCue : PHYSICS.stopSpeedObject;
+          return Math.hypot(b.vx, b.vy) < stopSpeed * 2.8;
+        });
+      }
+
+      function resetPowerSliderToTop() {
+        if (!poolPowerSlider) return;
+        poolPowerSlider.value = String(poolPowerSlider.max || 100);
+        if (onPowerInput) onPowerInput();
+      }
+
+      function resizeCanvas() {
+        const rect = basketballOverlay.getBoundingClientRect();
+        basketballCanvas.width = Math.max(320, Math.floor(rect.width));
+        basketballCanvas.height = Math.max(480, Math.floor(rect.height));
+        table.x = Math.max(58, basketballCanvas.width * 0.11);
+        table.y = Math.max(110, basketballCanvas.height * 0.17);
+        table.w = Math.max(220, basketballCanvas.width - table.x * 2);
+        table.h = Math.max(180, basketballCanvas.height - table.y - 70);
+        table.rail = Math.max(16, table.w * 0.03);
+        // Keep pocket radius larger than rail thickness so corner pockets cover table corners.
+        table.pocketR = Math.max(18, table.rail * 1.18);
+        layoutBalls();
+      }
+
+      function pt(e) {
+        const r = basketballCanvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+      }
+
+      function onPointerDown(e) {
+        const p = pt(e);
+        if (!allBallsStopped() || !cueBall || !cueBall.active) return;
+        if (Math.hypot(p.x - cueBall.x, p.y - cueBall.y) > BALL_R * 2.2) return;
+        isAiming = true;
+        lastDragPoint = { ...p };
+        hasAim = true;
+        shotQueuedBySlider = false;
+      }
+
+      function onPointerMove(e) {
+        if (!isAiming) return;
+        lastDragPoint = pt(e);
+        const dirX = lastDragPoint.x - cueBall.x;
+        const dirY = lastDragPoint.y - cueBall.y;
+        const len = Math.hypot(dirX, dirY) || 1;
+        aim.dx = dirX / len;
+        aim.dy = dirY / len;
+        hasAim = true;
+      }
+
+      function shootCueBall(powerRatioInput = null) {
+        if (!allBallsStopped() || !cueBall || !cueBall.active || !hasAim) return;
+        const powerRatio = powerRatioInput == null
+          ? Math.max(0.15, Number(poolPowerSlider?.value || 56) / 100)
+          : Math.max(0.15, Math.min(1, powerRatioInput));
+        const spd = 8 + powerRatio * 30;
+        cueBall.vx = aim.dx * spd;
+        cueBall.vy = aim.dy * spd;
+        cueBall.phase = 'sliding';
+        cueBall.slideFrames = PHYSICS.slideFramesAtShot;
+        cueBall.spinZ = aim.english * (6 + powerRatio * 4);
+        aim.power = powerRatio;
+        isAiming = false;
+        lastDragPoint = null;
+      }
+
+      function onPointerUp(e) {
+        if (!isAiming) return;
+        const p = pt(e);
+        const dirX = p.x - cueBall.x;
+        const dirY = p.y - cueBall.y;
+        const len = Math.hypot(dirX, dirY);
+        if (len > 0.001) {
+          aim.dx = dirX / len;
+          aim.dy = dirY / len;
+          hasAim = true;
+        }
+        isAiming = false;
+      }
+
+      function onPowerPointerDown() {
+        sliderPointerActive = true;
+        shotQueuedBySlider = !!(hasAim && allBallsStopped() && cueBall?.active);
+      }
+
+      function onPowerPointerUp() {
+        if (!sliderPointerActive) return;
+        sliderPointerActive = false;
+        if (!shotQueuedBySlider) return;
+        shotQueuedBySlider = false;
+        const releasePower = Math.max(0.15, Number(poolPowerSlider?.value || 56) / 100);
+        shootCueBall(releasePower);
+        resetPowerSliderToTop();
+      }
+
+      function pockets() {
+        const x = table.x;
+        const y = table.y;
+        const w = table.w;
+        const h = table.h;
+        const inset = table.rail;
+        const left = x + inset;
+        const right = x + w - inset;
+        const top = y + inset;
+        const bottom = y + h - inset;
+        const midY = y + h * 0.5;
+        return [
+          [left, top], [right, top],
+          [left, midY], [right, midY],
+          [left, bottom], [right, bottom],
+        ];
+      }
+
+      function simulate() {
+        for (const b of balls) {
+          if (!b.active) continue;
+
+          const speed = Math.hypot(b.vx, b.vy);
+          const slidingDecel = b.isCue ? PHYSICS.slidingDecelCue : PHYSICS.slidingDecelObject;
+          const rollingFriction = b.isCue ? PHYSICS.rollingFrictionCue : PHYSICS.rollingFrictionObject;
+          const stopSpeed = b.isCue ? PHYSICS.stopSpeedCue : PHYSICS.stopSpeedObject;
+          if (speed > 0.0001 && b.phase === 'sliding') {
+            const nextSpeed = Math.max(0, speed - slidingDecel);
+            const ratio = nextSpeed / speed;
+            b.vx *= ratio;
+            b.vy *= ratio;
+            b.slideFrames -= 1;
+
+            if (b.isCue && Math.abs(b.spinZ) > 0.0001) {
+              const px = -b.vy / (nextSpeed || 1);
+              const py = b.vx / (nextSpeed || 1);
+              const curve = b.spinZ * PHYSICS.englishCurve * Math.min(1.2, speed / 5.2);
+              b.vx += px * curve;
+              b.vy += py * curve;
+            }
+
+            b.spinZ *= PHYSICS.spinDecaySliding;
+            if (b.slideFrames <= 0 || nextSpeed < PHYSICS.rollTransitionSpeed) {
+              b.phase = 'rolling';
+            }
+          } else {
+            b.phase = 'rolling';
+            b.vx *= rollingFriction;
+            b.vy *= rollingFriction;
+            b.spinZ *= PHYSICS.spinDecayRolling;
+          }
+
+          b.x += b.vx;
+          b.y += b.vy;
+
+          if (Math.hypot(b.vx, b.vy) < stopSpeed) {
+            b.vx = 0;
+            b.vy = 0;
+            b.spinZ = 0;
+            b.phase = 'rolling';
+            b.slideFrames = 0;
+          }
+
+          const minX = table.x + table.rail + b.r;
+          const maxX = table.x + table.w - table.rail - b.r;
+          const minY = table.y + table.rail + b.r;
+          const maxY = table.y + table.h - table.rail - b.r;
+
+          if (b.x < minX) {
+            b.x = minX;
+            b.vx = Math.abs(b.vx) * PHYSICS.cushionRestitution;
+            b.vy *= PHYSICS.cushionTangentKeep;
+            b.phase = 'sliding';
+            b.slideFrames = Math.max(b.slideFrames, 4);
+          }
+          if (b.x > maxX) {
+            b.x = maxX;
+            b.vx = -Math.abs(b.vx) * PHYSICS.cushionRestitution;
+            b.vy *= PHYSICS.cushionTangentKeep;
+            b.phase = 'sliding';
+            b.slideFrames = Math.max(b.slideFrames, 4);
+          }
+          if (b.y < minY) {
+            b.y = minY;
+            b.vy = Math.abs(b.vy) * PHYSICS.cushionRestitution;
+            b.vx *= PHYSICS.cushionTangentKeep;
+            b.phase = 'sliding';
+            b.slideFrames = Math.max(b.slideFrames, 4);
+          }
+          if (b.y > maxY) {
+            b.y = maxY;
+            b.vy = -Math.abs(b.vy) * PHYSICS.cushionRestitution;
+            b.vx *= PHYSICS.cushionTangentKeep;
+            b.phase = 'sliding';
+            b.slideFrames = Math.max(b.slideFrames, 4);
+          }
+
+          for (const [px, py] of pockets()) {
+            if (Math.hypot(b.x - px, b.y - py) < table.pocketR * 0.8) {
+              b.active = false;
+              b.vx = 0;
+              b.vy = 0;
+              if (b.isCue) {
+                b.active = true;
+                b.x = table.x + table.w * 0.5;
+                b.y = isPortrait()
+                  ? table.y + table.h * 0.76
+                  : table.y + table.h * 0.5;
+                b.phase = 'rolling';
+                b.slideFrames = 0;
+                b.spinZ = 0;
+              }
+              break;
+            }
+          }
+        }
+
+        for (let i = 0; i < balls.length; i++) {
+          const a = balls[i];
+          if (!a.active) continue;
+          for (let j = i + 1; j < balls.length; j++) {
+            const b = balls[j];
+            if (!b.active) continue;
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dist = Math.hypot(dx, dy);
+            const minD = a.r + b.r;
+            if (dist >= minD || dist < 0.0001) continue;
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const overlap = minD - dist;
+            a.x -= nx * overlap * 0.5;
+            a.y -= ny * overlap * 0.5;
+            b.x += nx * overlap * 0.5;
+            b.y += ny * overlap * 0.5;
+
+            const rvx = b.vx - a.vx;
+            const rvy = b.vy - a.vy;
+            const velAlongNormal = rvx * nx + rvy * ny;
+            if (velAlongNormal > 0) continue;
+
+            const normalImpulse = -(1 + PHYSICS.ballRestitution) * velAlongNormal / 2;
+            const impulseX = normalImpulse * nx;
+            const impulseY = normalImpulse * ny;
+            a.vx -= impulseX;
+            a.vy -= impulseY;
+            b.vx += impulseX;
+            b.vy += impulseY;
+
+            const tx = -ny;
+            const ty = nx;
+            const velAlongTangent = rvx * tx + rvy * ty;
+
+            let tangentImpulse = -velAlongTangent / 2;
+            const maxFrictionImpulse = PHYSICS.ballBallFriction * Math.abs(normalImpulse);
+            tangentImpulse = Math.max(-maxFrictionImpulse, Math.min(maxFrictionImpulse, tangentImpulse));
+
+            if (a.isCue && Math.abs(a.spinZ) > 0.0001) {
+              tangentImpulse += a.spinZ * PHYSICS.throwFromEnglish;
+            }
+            if (b.isCue && Math.abs(b.spinZ) > 0.0001) {
+              tangentImpulse -= b.spinZ * PHYSICS.throwFromEnglish;
+            }
+            tangentImpulse = Math.max(-maxFrictionImpulse, Math.min(maxFrictionImpulse, tangentImpulse));
+
+            a.vx -= tangentImpulse * tx;
+            a.vy -= tangentImpulse * ty;
+            b.vx += tangentImpulse * tx;
+            b.vy += tangentImpulse * ty;
+
+            a.phase = 'sliding';
+            b.phase = 'sliding';
+            a.slideFrames = Math.max(a.slideFrames, PHYSICS.slideFramesAfterCollision);
+            b.slideFrames = Math.max(b.slideFrames, PHYSICS.slideFramesAfterCollision);
+
+            if (a.isCue) a.spinZ *= 0.78;
+            if (b.isCue) b.spinZ *= 0.78;
+          }
+        }
+      }
+
+      function checkScore() {
+        if (scored) return;
+        if (blackBall && !blackBall.active) {
+          scored = true;
+          const msg = '黑球進袋！挑戰成功';
+          basketballSubtitle.textContent = `${msg} 即將跳轉...`;
+          showSecretToast(msg);
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 1400);
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, basketballCanvas.width, basketballCanvas.height);
+        ctx.fillStyle = '#15213a';
+        ctx.fillRect(0, 0, basketballCanvas.width, basketballCanvas.height);
+
+        ctx.fillStyle = '#6f1f18';
+        ctx.fillRect(table.x, table.y, table.w, table.h);
+
+        ctx.fillStyle = '#3ea4cf';
+        ctx.fillRect(
+          table.x + table.rail,
+          table.y + table.rail,
+          table.w - table.rail * 2,
+          table.h - table.rail * 2,
+        );
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        if (isPortrait()) {
+          ctx.moveTo(table.x + table.rail + 2, table.y + table.h * 0.5);
+          ctx.lineTo(table.x + table.w - table.rail - 2, table.y + table.h * 0.5);
+        } else {
+          ctx.moveTo(table.x + table.w * 0.5, table.y + table.rail + 2);
+          ctx.lineTo(table.x + table.w * 0.5, table.y + table.h - table.rail - 2);
+        }
+        ctx.stroke();
+
+        ctx.fillStyle = '#120a08';
+        for (const [px, py] of pockets()) {
+          ctx.beginPath();
+          ctx.arc(px, py, table.pocketR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (const b of balls) {
+          if (!b.active) continue;
+          const grad = ctx.createRadialGradient(b.x - b.r * 0.35, b.y - b.r * 0.4, 2, b.x, b.y, b.r + 1);
+          if (b.isCue) {
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(1, '#d7d7d7');
+          } else {
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.2, b.color);
+            grad.addColorStop(1, '#121212');
+          }
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+
+        const canShowCue = allBallsStopped() && cueBall?.active && (isAiming || hasAim);
+        if (canShowCue) {
+          const powerRatio = Math.max(0.15, Number(poolPowerSlider?.value || 56) / 100);
+          const cueBack = 34 + powerRatio * 56;
+          const cueFront = cueBack + 160;
+
+          ctx.save();
+          ctx.strokeStyle = 'rgba(206, 174, 132, 0.88)';
+          ctx.lineWidth = 7;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(cueBall.x - aim.dx * cueBack, cueBall.y - aim.dy * cueBack);
+          ctx.lineTo(cueBall.x - aim.dx * cueFront, cueBall.y - aim.dy * cueFront);
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.save();
+          ctx.setLineDash([9, 9]);
+          ctx.strokeStyle = 'rgba(255, 241, 210, 0.78)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cueBall.x, cueBall.y);
+          for (let t = 20; t <= 420; t += 18) {
+            ctx.lineTo(cueBall.x + aim.dx * t, cueBall.y + aim.dy * t);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.textAlign = 'center';
+        ctx.font = `bold ${Math.min(22, table.w * 0.06)}px sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.86)';
+        ctx.fillText('目標：黑球進袋', table.x + table.w * 0.5, table.y + table.h + 34);
+      }
+
+      function loop() {
+        if (!running) return;
+        simulate();
+        checkScore();
+        draw();
+        rafId = requestAnimationFrame(loop);
+      }
+
+      function stopGame() {
+        running = false;
+        cancelAnimationFrame(rafId);
+        basketballOverlay.style.display = 'none';
+        if (titleEl) titleEl.textContent = 'Pool Mode';
+        basketballSubtitle.textContent = '美式快布：黑球進袋即勝，白球進袋會回桌中央。';
+        basketballCanvas.removeEventListener('pointerdown', onPointerDown);
+        basketballCanvas.removeEventListener('pointermove', onPointerMove);
+        basketballCanvas.removeEventListener('pointerup', onPointerUp);
+        basketballCanvas.removeEventListener('pointercancel', onPointerUp);
+        if (poolPowerSlider) {
+          poolPowerSlider.removeEventListener('pointerdown', onPowerPointerDown);
+          poolPowerSlider.removeEventListener('pointerup', onPowerPointerUp);
+          poolPowerSlider.removeEventListener('pointercancel', onPowerPointerUp);
+          poolPowerSlider.removeEventListener('change', onPowerPointerUp);
+        }
+        window.removeEventListener('resize', resizeCanvas);
+        if (poolPowerSlider && onPowerInput) {
+          poolPowerSlider.removeEventListener('input', onPowerInput);
+        }
+        if (poolEnglishSlider && onEnglishInput) {
+          poolEnglishSlider.removeEventListener('input', onEnglishInput);
+        }
+        basketballCloseButton.onclick = null;
+      }
+
+      if (poolPowerSlider && poolPowerValue) {
+        onPowerInput = () => {
+          poolPowerValue.textContent = `${poolPowerSlider.value}%`;
+          aim.power = Number(poolPowerSlider.value) / 100;
+        };
+        poolPowerSlider.addEventListener('input', onPowerInput);
+        poolPowerSlider.addEventListener('pointerdown', onPowerPointerDown);
+        poolPowerSlider.addEventListener('pointerup', onPowerPointerUp);
+        poolPowerSlider.addEventListener('pointercancel', onPowerPointerUp);
+        poolPowerSlider.addEventListener('change', onPowerPointerUp);
+        resetPowerSliderToTop();
+        onPowerInput();
+      }
+
+      if (poolEnglishSlider && poolEnglishValue) {
+        onEnglishInput = () => {
+          const english = Number(poolEnglishSlider.value) || 0;
+          poolEnglishValue.textContent = `${english > 0 ? '+' : ''}${english}`;
+          aim.english = english / 100;
+        };
+        poolEnglishSlider.addEventListener('input', onEnglishInput);
+        onEnglishInput();
+      }
+
+      resizeCanvas();
+      basketballCanvas.addEventListener('pointerdown', onPointerDown);
+      basketballCanvas.addEventListener('pointermove', onPointerMove);
+      basketballCanvas.addEventListener('pointerup', onPointerUp);
+      basketballCanvas.addEventListener('pointercancel', onPointerUp);
+      window.addEventListener('resize', resizeCanvas);
+      basketballCloseButton.onclick = stopGame;
+      loop();
+    }
+
     function closeAuthReconcileModal() {
       authReconcileModal.style.display = 'none';
     }
@@ -996,54 +2084,33 @@
       const queueIdentity = getStoredQueueIdentity();
       const cancelToken = queueIdentity.cancelToken;
 
-      // 優先處理使用中的訪客
       if (controlToken) {
         try {
           const statusResponse = await fetch('/api/status', { cache: 'no-store' });
-          if (!statusResponse.ok) {
-            return;
-          }
-
+          if (!statusResponse.ok) return;
           const statusData = await statusResponse.json();
           const currentOwnerName = localStorage.getItem('macqueue_current_owner_name');
           const isLocalGuestUsingNow = !!(
-            statusData.current_user &&
-            currentOwnerName &&
-            statusData.current_user === currentOwnerName &&
-            !statusData.current_google_sub
+            statusData.current_user && currentOwnerName &&
+            statusData.current_user === currentOwnerName && !statusData.current_google_sub
           );
-
-          if (!isLocalGuestUsingNow) {
-            return;
-          }
-
+          if (!isLocalGuestUsingNow) return;
           const samePerson = await openAuthReconcileModal(statusData.current_user);
-
           const reconcileResponse = await fetch('/api/auth/reconcile-current', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              control_token: controlToken,
-              same_person: samePerson,
-              name: profile.name,
-              google_sub: profile.sub || null,
-              google_email: profile.email || null,
+              control_token: controlToken, same_person: samePerson,
+              name: profile.name, google_sub: profile.sub || null, google_email: profile.email || null,
             }),
           });
-
           if (!reconcileResponse.ok) {
-            const errorPayload = await reconcileResponse.json().catch(() => null);
-            throw new Error(errorPayload?.error || 'reconcile failed');
+            const ep = await reconcileResponse.json().catch(() => null);
+            throw new Error(ep?.error || 'reconcile failed');
           }
-
-          const reconcileResult = await reconcileResponse.json();
-          if (reconcileResult.mode === 'bound') {
-            setCurrentUsageToken(controlToken, profile.name);
-          }
-          if (reconcileResult.mode === 'removed') {
-            clearCurrentUsageToken();
-          }
-
+          const rr = await reconcileResponse.json();
+          if (rr.mode === 'bound') setCurrentUsageToken(controlToken, profile.name);
+          if (rr.mode === 'removed') clearCurrentUsageToken();
           await updateStatus();
         } catch (error) {
           console.error('訪客/Google 身分協調失敗:', error);
@@ -1051,45 +2118,28 @@
         return;
       }
 
-      // 如果沒有使用中的訪客，檢查排隊中的訪客
       if (cancelToken) {
         try {
           const statusResponse = await fetch('/api/status', { cache: 'no-store' });
-          if (!statusResponse.ok) {
-            return;
-          }
-
+          if (!statusResponse.ok) return;
           const statusData = await statusResponse.json();
           const queueEntry = statusData.queue.find((item) => item.cancel_token === cancelToken);
-
-          if (!queueEntry) {
-            return;
-          }
-
+          if (!queueEntry) return;
           const samePerson = await openAuthReconcileModal(queueEntry.name);
-
           const reconcileQueueResponse = await fetch('/api/auth/reconcile-queue-entry', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              cancel_token: cancelToken,
-              same_person: samePerson,
-              name: profile.name,
-              google_sub: profile.sub || null,
-              google_email: profile.email || null,
+              cancel_token: cancelToken, same_person: samePerson,
+              name: profile.name, google_sub: profile.sub || null, google_email: profile.email || null,
             }),
           });
-
           if (!reconcileQueueResponse.ok) {
-            const errorPayload = await reconcileQueueResponse.json().catch(() => null);
-            throw new Error(errorPayload?.error || 'reconcile queue entry failed');
+            const ep = await reconcileQueueResponse.json().catch(() => null);
+            throw new Error(ep?.error || 'reconcile queue entry failed');
           }
-
-          const reconcileResult = await reconcileQueueResponse.json();
-          if (reconcileResult.mode === 'removed') {
-            clearStoredQueueIdentity();
-          }
-
+          const rr = await reconcileQueueResponse.json();
+          if (rr.mode === 'removed' || rr.mode === 'removed_already_active') clearStoredQueueIdentity();
           await updateStatus();
         } catch (error) {
           console.error('排隊訪客/Google 身分協調失敗:', error);
@@ -1237,12 +2287,13 @@
           description: getIosInstallDescription(),
           showButton: false,
         });
-
         if (sessionStorage.getItem('installDismissed')) {
           showInstallReopen();
         } else {
           showInstallBanner();
         }
+        // Always ensure icon is visible on iOS Safari regardless of banner state
+        showInstallReopen();
       }
 
       if (!isIos && !isStandalone && sessionStorage.getItem('installDismissed')) {
@@ -1257,6 +2308,10 @@
 
       dismissInstallBtn.addEventListener('click', dismissBanner);
       installReopenBtn.addEventListener('click', () => {
+        if (suppressInstallReopenClick) {
+          suppressInstallReopenClick = false;
+          return;
+        }
         sessionStorage.removeItem('installDismissed');
         if (isIos && !isStandalone) {
           configureInstallPrompt({
@@ -1275,6 +2330,71 @@
           });
         }
         showInstallBanner();
+      });
+    }
+
+    function setupEasterEggTriggers() {
+      setupLongPress(topAuthPanel, {
+        holdMs: 5000,
+        shouldIgnore: (event) => {
+          const target = event.target;
+          return !!(
+            target.closest('button') ||
+            target.closest('#googleSignInButton') ||
+            target.tagName === 'IFRAME'
+          );
+        },
+        onStart: () => {
+          topAuthPanel.classList.remove('expanded');
+          growDelayTimer = setTimeout(startTopPanelGrowth, 2000);
+        },
+        onCancel: () => {
+                    clearTimeout(growDelayTimer);
+          stopTopPanelGrowth(true);
+          topAuthPanel.classList.remove('egg-ready');
+        },
+        onComplete: () => {
+                    clearTimeout(growDelayTimer);
+          suppressTopPanelToggle = true;
+          stopTopPanelGrowth(true);
+          topAuthPanel.classList.add('egg-ready');
+          openSecretUrlOverlay();
+          setTimeout(() => topAuthPanel.classList.remove('egg-ready'), 1100);
+        },
+      });
+
+      // Stop panel clicks propagating to the outside-click handler
+      topAuthPanel.addEventListener('click', (e) => e.stopPropagation());
+      topAuthPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
+      document.addEventListener('click', () => topAuthPanel.classList.remove('expanded'));
+      document.addEventListener('pointerdown', () => topAuthPanel.classList.remove('expanded'));
+
+      setupActionButtonGameTrigger(queueActionButton);
+      setupActionButtonGameTrigger(confirmTurnButton);
+      setupActionButtonGameTrigger(endUsageButton);
+
+      if (topAuthPanelIcon) {
+        topAuthPanelIcon.addEventListener('click', toggleTopAuthPanel);
+        topAuthPanelIcon.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleTopAuthPanel();
+          }
+        });
+      }
+
+      secretUrlCancelButton.addEventListener('click', closeSecretUrlOverlay);
+      secretUrlSaveButton.addEventListener('click', saveSecretUrl);
+      secretUrlOverlay.addEventListener('click', (event) => {
+        if (event.target === secretUrlOverlay) {
+          closeSecretUrlOverlay();
+        }
+      });
+      secretUrlInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          saveSecretUrl();
+        }
       });
     }
 
@@ -1623,6 +2743,7 @@
 
     setupGoogleAuth();
     setupInstallPrompt();
+    setupEasterEggTriggers();
     pollStatusLoop();
     window.joinQueue = joinQueue;
     window.endUsage = endUsage;

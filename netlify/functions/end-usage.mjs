@@ -1,9 +1,11 @@
 import {
+  clearPendingState,
   badRequest,
   jsonResponse,
   loadState,
   methodNotAllowed,
   parseJson,
+  promoteNextToPending,
   saveState,
 } from "./_lib/state.mjs";
 
@@ -44,20 +46,8 @@ export default async function handler(request) {
   state.current_google_email = null;
   state.start_time = null;
   state.current_control_token = null;
-  state.pending_user = null;
-  state.pending_google_sub = null;
-  state.pending_google_email = null;
-  state.pending_person_id = null;
-  state.pending_cancel_token = null;
-
-  if (state.queue.length > 0) {
-    const nextPerson = state.queue.shift();
-    state.pending_user = nextPerson.name;
-    state.pending_google_sub = nextPerson.google_sub ?? null;
-    state.pending_google_email = nextPerson.google_email ?? null;
-    state.pending_person_id = nextPerson.id;
-    state.pending_cancel_token = nextPerson.cancel_token;
-  }
+  clearPendingState(state);
+  promoteNextToPending(state);
 
   await saveState(state);
   return jsonResponse({ success: true, emergency });
