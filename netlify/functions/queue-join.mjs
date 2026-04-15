@@ -51,6 +51,20 @@ export default async function handler(request) {
         cancel_token: existingByGoogle.cancel_token,
       });
     }
+
+    const isCurrentGoogleUser = state.current_google_sub && state.current_google_sub === googleIdentity.sub;
+    const isPendingGoogleUser = state.pending_google_sub && state.pending_google_sub === googleIdentity.sub;
+    if (isCurrentGoogleUser || isPendingGoogleUser) {
+      return jsonResponse({ success: true, mode: "already_active" });
+    }
+  }
+
+  if (googleIdentity.email) {
+    const isCurrentGoogleEmail = state.current_google_email && state.current_google_email === googleIdentity.email;
+    const isPendingGoogleEmail = state.pending_google_email && state.pending_google_email === googleIdentity.email;
+    if (isCurrentGoogleEmail || isPendingGoogleEmail) {
+      return jsonResponse({ success: true, mode: "already_active" });
+    }
   }
 
   if (state.current_user || state.pending_user) {

@@ -1139,6 +1139,8 @@
     let deferredPrompt = null;
     let statusPollTimer = null;
     let statusRequestInFlight = false;
+    let joinRequestInFlight = false;
+    let lastJoinSubmitAt = 0;
     let timerInterval = null;
     let resolveAuthReconcileChoice = null;
     let suppressInstallReopenClick = false;
@@ -2567,9 +2569,21 @@
         return;
       }
 
+      if (joinRequestInFlight) {
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastJoinSubmitAt < 800) {
+        return;
+      }
+      lastJoinSubmitAt = now;
+
       const { cancelToken: existingCancelToken } = getStoredQueueIdentity();
       const { google_sub: googleSub, google_email: googleEmail } = getGoogleAuthPayload();
       localStorage.setItem('macqueue_my_name', name);
+      joinRequestInFlight = true;
+      queueActionButton.disabled = true;
 
       try {
         const response = await fetch('/api/queue/join', {
@@ -2597,6 +2611,8 @@
         } else if (result.mode === 'started' && result.current_control_token) {
           clearStoredQueueIdentity();
           setCurrentUsageToken(result.current_control_token, name);
+        } else if (result.mode === 'already_active') {
+          // Keep existing local tokens as-is; server confirmed this identity is already active/pending.
         } else {
           clearStoredQueueIdentity();
           clearCurrentUsageToken();
@@ -2607,6 +2623,9 @@
       } catch (error) {
         console.error('錯誤:', error);
         alert(error.message || '發生錯誤，請稍後再試!');
+      } finally {
+        joinRequestInFlight = false;
+        queueActionButton.disabled = false;
       }
     }
 
@@ -2724,6 +2743,10 @@
 
     queueNameInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
+        // Ignore Enter while IME composition is active to avoid duplicate submits.
+        if (event.isComposing || event.keyCode === 229 || event.repeat) {
+          return;
+        }
         event.preventDefault();
         joinQueue();
       }
